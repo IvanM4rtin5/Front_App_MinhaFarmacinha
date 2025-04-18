@@ -1,5 +1,6 @@
 <template>
   <q-layout view="lHh Lpr lFf">
+    <!-- Cabeçalho -->
     <q-header elevated>
       <q-toolbar>
         <q-btn
@@ -10,35 +11,49 @@
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-
         <q-toolbar-title>
-          Quasar App
+          Minha Farmacinha
         </q-toolbar-title>
-
-        <div>Quasar v{{ $q.version }}</div>
       </q-toolbar>
     </q-header>
 
+    <!-- Menu lateral -->
     <q-drawer
       v-model="leftDrawerOpen"
       show-if-above
       bordered
     >
-      <q-list>
-        <q-item-label
-          header
-        >
-          Essential Links
-        </q-item-label>
+      <q-list padding>
+        <q-item-label header> Menu </q-item-label>
 
-        <EssentialLink
-          v-for="link in linksList"
-          :key="link.title"
-          v-bind="link"
-        />
+        <q-item clickable to="/" exact>
+          <q-item-section avatar><q-icon name="homepage" /></q-item-section>
+          <q-item-section>Home</q-item-section>
+        </q-item>
+
+        <q-item clickable to="/medicines">
+          <q-item-section avatar><q-icon name="medical_services" /></q-item-section>
+          <q-item-section>Medicamentos</q-item-section>
+        </q-item>
+
+        <q-item clickable to="/shopping">
+          <q-item-section avatar><q-icon name="shopping_cart" /></q-item-section>
+          <q-item-section>Compras</q-item-section>
+        </q-item>
+
+        <q-item clickable to="/chat">
+          <q-item-section avatar><q-icon name="chat" /></q-item-section>
+          <q-item-section>Chat IA</q-item-section>
+        </q-item>
+
+        <q-item clickable to="/profile">
+          <q-item-section avatar><q-icon name="person" /></q-item-section>
+          <q-item-section>Perfil</q-item-section>
+        </q-item>
       </q-list>
     </q-drawer>
 
+    <!-- Conteúdo da página -->
     <q-page-container>
       <router-view />
     </q-page-container>
@@ -46,57 +61,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import EssentialLink, { type EssentialLinkProps } from 'components/EssentialLink.vue';
+import { ref } from 'vue'
 
-const linksList: EssentialLinkProps[] = [
-  {
-    title: 'Docs',
-    caption: 'quasar.dev',
-    icon: 'school',
-    link: 'https://quasar.dev'
-  },
-  {
-    title: 'Github',
-    caption: 'github.com/quasarframework',
-    icon: 'code',
-    link: 'https://github.com/quasarframework'
-  },
-  {
-    title: 'Discord Chat Channel',
-    caption: 'chat.quasar.dev',
-    icon: 'chat',
-    link: 'https://chat.quasar.dev'
-  },
-  {
-    title: 'Forum',
-    caption: 'forum.quasar.dev',
-    icon: 'record_voice_over',
-    link: 'https://forum.quasar.dev'
-  },
-  {
-    title: 'Twitter',
-    caption: '@quasarframework',
-    icon: 'rss_feed',
-    link: 'https://twitter.quasar.dev'
-  },
-  {
-    title: 'Facebook',
-    caption: '@QuasarFramework',
-    icon: 'public',
-    link: 'https://facebook.quasar.dev'
-  },
-  {
-    title: 'Quasar Awesome',
-    caption: 'Community Quasar projects',
-    icon: 'favorite',
-    link: 'https://awesome.quasar.dev'
-  }
-];
+const leftDrawerOpen = ref(false)
 
-const leftDrawerOpen = ref(false);
-
-function toggleLeftDrawer () {
-  leftDrawerOpen.value = !leftDrawerOpen.value;
+function toggleLeftDrawer() {
+  leftDrawerOpen.value = !leftDrawerOpen.value
 }
 </script>
