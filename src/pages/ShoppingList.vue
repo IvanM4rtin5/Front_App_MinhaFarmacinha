@@ -11,7 +11,7 @@
   
   <style scoped>
   h1 {
-    color: var(--Laranja-Suave);
+    color: var(--orange-smooth);
   }
   </style>
   

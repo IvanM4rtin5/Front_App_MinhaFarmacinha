@@ -11,7 +11,7 @@
   
   <style scoped>
   h1 {
-    color: var(--Amarelo-Calmo);
+    color: var(--yellow-Calm);
   }
   </style>
   

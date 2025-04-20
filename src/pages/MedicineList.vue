@@ -10,7 +10,7 @@
   
   <style scoped>
   h1 {
-    color: var(--Verde-Escuro);
+    color: var(--green-dark);
   }
   </style>
   

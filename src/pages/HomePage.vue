@@ -2,11 +2,11 @@
   <q-page padding>
     <div class="row items-center q-mb-md">
       <div class="col">
-        <h5 class="text-primary">Resumo do Dia</h5>
+        <h5 class=" text-primary">Resumo do Dia</h5>
       </div>
     </div>
 
-    <div class="row q-col-gutter-md q-mb-lg">
+    <div class="row q-col-gutter-m q-mb-lg">
       <q-card class="col-xs-12 col-sm-4" bordered>
         <q-card-section>
           <div class="text-h6 text-primary">💊 Medicamentos Ativos</div>
@@ -15,7 +15,7 @@
         </q-card-section>
       </q-card>
 
-      <q-card class="col-xs-12 col-sm-4" bordered>
+      <q-card class="col-xs-12 col-sm-4" bordered >
         <q-card-section>
           <div class="text-h6 text-negative">⚠️ Reposição Urgente</div>
           <div class="text-h4 text-weight-bold q-mt-sm">01</div>
@@ -32,7 +32,7 @@
       </q-card>
     </div>
 
-    <div class="row q-col-gutter-md">
+    <div class="row q-col-gutter-m">
       <q-card class="col-xs-12 col-md-6" bordered>
         <q-card-section>
           <div class="text-subtitle1">📅 Próximo lembrete</div>

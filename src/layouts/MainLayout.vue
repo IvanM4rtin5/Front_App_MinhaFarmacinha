@@ -20,9 +20,10 @@
 
     <!-- Menu lateral -->
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
-      <q-list padding class="text-grey-8">
-        <q-item-label header class="text-uppercase text-bold text-grey-7">
-          Navegação
+      <q-list padding class="text-white">
+        <q-item-label header 
+        class="text-uppercase text-bold text-white text-center q-mt-7 q-mb-lg">
+          Menu
         </q-item-label>
 
         <q-item clickable to="/" exact>
@@ -78,3 +79,12 @@ function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
 </script>
+
+<style>
+.q-drawer {
+  background-color: var(--gray-dark);
+}
+.q-item, .q-item-label {
+  font-size: 18px;
+}
+</style>

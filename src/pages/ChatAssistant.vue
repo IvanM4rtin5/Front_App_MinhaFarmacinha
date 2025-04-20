@@ -1,5 +1,5 @@
 <template>
-    <q-page >
+    <q-page class="q-pa-md" >
       <h1>Chat de Dúvidas</h1>
       <p>Converse com o nosso assistente inteligente sobre medicação e cuidados.</p>
     </q-page>
@@ -11,7 +11,7 @@
   
   <style scoped>
   h1 {
-    color: var(--Cinza-Escuro);
+    color: var(--green-dark);
   }
   </style>
   
