@@ -26,12 +26,12 @@
           Menu
         </q-item-label>
 
-        <q-item clickable to="/" exact>
+        <!-- <q-item clickable to="/" exact>
           <q-item-section avatar
             ><q-icon name="home" color="primary"
           /></q-item-section>
           <q-item-section>Início</q-item-section>
-        </q-item>
+        </q-item> -->
 
         <q-item clickable to="/medicines">
           <q-item-section avatar
