@@ -24,14 +24,21 @@
         <q-item-label header 
         class="text-uppercase text-bold text-white text-center q-mt-7 q-mb-lg">
           Menu
+          <!-- Mostrar nome do usuário no menu -->
+          <div v-if="user" class="text-center q-mt-sm">{{ name }}
+            <q-btn>
+              <q-avatar size="md"></q-avatar>
+                <q-icon name="person" color="white" />
+            </q-btn>
+          </div>
         </q-item-label>
 
-        <!-- <q-item clickable to="/" exact>
+        <q-item clickable to="/home" exact>
           <q-item-section avatar
             ><q-icon name="home" color="primary"
           /></q-item-section>
           <q-item-section>Início</q-item-section>
-        </q-item> -->
+        </q-item>
 
         <q-item clickable to="/medicines">
           <q-item-section avatar
@@ -72,12 +79,17 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { useAuthStore } from '../stores/auth';
+import { storeToRefs } from "pinia";
 
 const leftDrawerOpen = ref(false);
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
+const authStore = useAuthStore()
+const { name, user } = storeToRefs(authStore);
+  
 </script>
 
 <style>

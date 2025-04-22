@@ -39,7 +39,7 @@
             color="negative" 
             class=" q-ml-lg"
             />
-          </div>
+          </div> 
         </form>
       </div>
       <div class="login-right">
@@ -54,14 +54,28 @@
 
 <script setup lang="ts">
 
-import { useRouter } from "vue-router";
 import { ref } from "vue";
+import { useRouter } from "vue-router";
+import { useAuthStore } from "../stores/auth";
+import { useNotify } from "src/composables/useNotify";
+
 const username = ref("");
 const password = ref("");
 const router = useRouter();
+const loginError = ref(false);
+const authStore = useAuthStore();
+const {success, error,} = useNotify();
 
-const handleLogin = () => {
- router.push("/profile");
+const handleLogin = async () => {
+  const user = authStore.login(username.value, password.value);
+  if (user){
+    loginError.value = false;
+    success("Login realizado com sucesso!");
+    await router.push("/home");
+  } else{
+    loginError.value = true;
+    error("Usuário ou senha incorretos");
+  } 
 };
 
 </script>
