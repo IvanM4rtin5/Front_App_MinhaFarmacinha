@@ -27,7 +27,6 @@
         >
           Menu
         </q-item-label>
-
         <q-btn
           flat
           rounded

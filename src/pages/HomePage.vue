@@ -2,7 +2,8 @@
     <q-page padding>
       <div class="row items-center q-mb-lg">
         <div class="col">
-          <h5 class="text-primary">Resumo do Dia</h5>
+          <h5 class="text-primary">Minha Farmacinha <q-icon name="chevron_right" />Resumo do Dia</h5>
+          <p class="text-grey-7">Bem-vindo, {{ name }}</p>
         </div>
       </div>
   
@@ -54,7 +55,9 @@
   
   
   <script setup lang="ts">
-  // Aqui futuramente você pode puxar dados via API ou store
+  import { ref } from 'vue';
+  
+  const name = ref('Ivan Martins');
   </script>
   
   <style scoped>
@@ -70,5 +73,9 @@
   
   .text-h6 {
     font-weight: 600;
+  }
+  p {
+    font-weight: 500;
+    font-size: 15px;
   }
   </style>
