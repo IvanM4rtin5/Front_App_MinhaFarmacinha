@@ -67,6 +67,7 @@ const authStore = useAuthStore();
 const {success, error,} = useNotify();
 
 const handleLogin = async () => {
+  console.log(username.value, password.value);
   const user = authStore.login(username.value, password.value);
   if (user){
     loginError.value = false;

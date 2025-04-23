@@ -3,7 +3,7 @@
       <div class="row items-center q-mb-lg">
         <div class="col">
           <h5 class="text-primary">Minha Farmacinha <q-icon name="chevron_right" />Resumo do Dia</h5>
-          <p class="text-grey-7">Bem-vindo, {{ name }}</p>
+          <p class="text-grey-7">Bem-vindo {{ name ? `, ${name}` : '' }}</p>
         </div>
       </div>
   
@@ -57,7 +57,7 @@
   <script setup lang="ts">
   import { ref } from 'vue';
   
-  const name = ref('Ivan Martins');
+  const name = ref(localStorage.getItem('userName') || 'Visitante');
   </script>
   
   <style scoped>

@@ -1,42 +1,57 @@
 import { defineStore, acceptHMRUpdate } from 'pinia';
 
 interface User {
-  name: string
-  email: string 
+  name: string;
+  email: string;
 }
+
 interface AuthState {
-  user: User| false
+  name: string;
+  user: User | false;
 }
 
 export const useAuthStore = defineStore('auth', {
-  state: () : AuthState => ({
-    user: false
+  state: (): AuthState => ({
+    name: localStorage.getItem('name') || '',
+    user: JSON.parse(localStorage.getItem('user') || 'false')
   }),
 
   getters: {
-    name: (state: AuthState) => {
-      return state.user ? state.user.name : ''
-    },
     email: (state: AuthState) => {
-      return state.user ? state.user.email : ''
+      return state.user ? state.user.email : '';
     }
   },
-  
+
   actions: {
-    login(username: string, passoword: string): User|false {
-      this.user = false
-      if(username === 'admim' && passoword === 'admim') {
-        this.user = {
-          name: 'Adminstrador',
+    login(username: string, password: string): User | false {
+      if (username === 'admim' && password === 'admim') {
+        const user: User = {
+          name: 'Administrador',
           email: 'admim@admim.com'
-        }
+        };
+
+        this.user = user;
+        this.name = user.name;
+
+        localStorage.setItem('user', JSON.stringify(user));
+        localStorage.setItem('name', user.name);
+
+        return user;
+      } else {
+        this.user = false;
+        this.name = '';
+        localStorage.removeItem('user');
+        localStorage.removeItem('name');
+        return false;
       }
-      return this.user
     },
 
     logout() {
-      
-      this.user = false
+      this.name = '';
+      this.user = false;
+
+      localStorage.removeItem('name');
+      localStorage.removeItem('user');
     }
   }
 });

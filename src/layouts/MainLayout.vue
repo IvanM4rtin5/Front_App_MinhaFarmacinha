@@ -16,44 +16,38 @@
         </q-avatar>
         <q-toolbar-title> Minha Farmacinha </q-toolbar-title>
       </q-toolbar>
-    </q-header> 
-
+    </q-header>
     <!-- Menu lateral -->
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list padding class="text-white">
-        <q-item-label
-          header
-          class="text-uppercase text-bold text-white text-center q-mt-7 q-mb-lg"
-        >
-          Menu
-        </q-item-label>
-        <q-btn
-          flat
-          rounded
-          class="q-mb-md q-px-md q-ml-lg items-center "
-        >
-        <q-avatar
-        size="32px"
-        color="primary"
-        text-color="white"
-        class="q-mr-sm"
-        >
-        <q-icon name="person" />
-      </q-avatar>
-      <div class="text-white text-subtitle2 text-left" v-if="name">{{ name }}
-            <q-menu>
-              <q-list>
-                <q-btn 
-                flat 
-                label="Sair"
-                color="negative"
-                @click="handleUserClick"
-                />
+
+        <!-- Usuário (avatar + nome + menu) -->
+        <div class="q-mt-xl q-mb-md flex flex-center column">
+          <q-avatar size="56px" color="primary" text-color="white">
+            <q-icon name="person" />
+          </q-avatar>
+
+          <div class="q-mt-sm text-subtitle2 text-white text-center">
+            {{ name || "Usuário" }}
+          </div>
+
+          <q-btn dense flat color="primary" label="Opções" class="q-mt-sm">
+            <q-menu transition-show="rotate" transition-hide="rotate">
+              <q-list style="min-width: 90px; color: var(--gray-dark);">
+                <q-item clickable>
+                  <q-item-section>Having fun</q-item-section>
+                </q-item>
+                <q-item clickable>
+                  <q-item-section>Crazy for transitions</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item clickable @click="handleUserClick">
+                  <q-item-section>Sair</q-item-section>
+                </q-item>
               </q-list>
             </q-menu>
-
-          </div>
-        </q-btn>
+          </q-btn>
+        </div>
 
         <q-separator spaced color="grey-6" />
 
@@ -116,10 +110,10 @@ function toggleLeftDrawer() {
 const authStore = useAuthStore();
 const { name, user } = storeToRefs(authStore);
 
-function  handleUserClick() {
+function handleUserClick() {
   if (user.value) {
     authStore.logout();
-    void router.push('/')
+    void router.push("/");
   }
 }
 </script>
