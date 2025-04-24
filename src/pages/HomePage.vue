@@ -3,7 +3,7 @@
       <div class="row items-center q-mb-lg">
         <div class="col">
           <h5 class="text-primary">Minha Farmacinha <q-icon name="chevron_right" />Resumo do Dia</h5>
-          <p class="text-grey-7">Bem-vindo {{ name ? `, ${name}` : '' }}</p>
+          <p @click="handleUserClick" class="text-grey-7" style="cursor: pointer;">Bem-vindo {{ name }}</p>
         </div>
       </div>
   
@@ -56,8 +56,16 @@
   
   <script setup lang="ts">
   import { ref } from 'vue';
+  import { useRouter } from 'vue-router';
+ 
   
-  const name = ref(localStorage.getItem('userName') || 'Visitante');
+  const router = useRouter();
+  const name = ref(localStorage.getItem('name') || 'Visitante');
+  
+  const handleUserClick = () => {
+    void router.push('/profile');
+  };
+  
   </script>
   
   <style scoped>

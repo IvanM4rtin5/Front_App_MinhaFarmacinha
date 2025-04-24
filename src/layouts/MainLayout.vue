@@ -24,7 +24,8 @@
         <!-- Usuário (avatar + nome + menu) -->
         <div class="q-mt-xl q-mb-md flex flex-center column">
           <q-avatar size="56px" color="primary" text-color="white">
-            <q-icon name="person" />
+            {{ name?.[0]?.toUpperCase() + (name?.[1] ?? '') || '?' }}
+            <!-- <q-icon name="person" /> -->
           </q-avatar>
 
           <div class="q-mt-sm text-subtitle2 text-white text-center">
