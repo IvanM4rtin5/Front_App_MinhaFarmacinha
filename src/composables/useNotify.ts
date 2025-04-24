@@ -9,7 +9,7 @@ export function useNotify() {
       color: 'positive',
       textColor: 'white',
       icon: 'done',
-      timeout: 2000
+      timeout: 3000
     })
   }
 
@@ -21,7 +21,7 @@ export function useNotify() {
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
-      timeout: 2000
+      timeout: 3000
     })
   }
 
@@ -33,7 +33,7 @@ export function useNotify() {
       color: 'warning',
       textColor: 'white',
       icon: 'warning',
-      timeout: 2000
+      timeout: 3000
     })
   }
 
@@ -45,7 +45,7 @@ export function useNotify() {
       color: 'info',
       textColor: 'white',
       icon: 'info',
-      timeout: 2000
+      timeout: 3000
     })
   }
 

@@ -36,14 +36,14 @@
             <q-menu transition-show="rotate" transition-hide="rotate">
               <q-list style="min-width: 90px; color: var(--gray-dark);">
                 <q-item clickable>
-                  <q-item-section>Having fun</q-item-section>
+                  <q-item-section>Configurações</q-item-section>
                 </q-item>
                 <q-item clickable>
-                  <q-item-section>Crazy for transitions</q-item-section>
+                  <q-item-section>Editar perfil</q-item-section>
                 </q-item>
                 <q-separator />
                 <q-item clickable @click="handleUserClick">
-                  <q-item-section>Sair</q-item-section>
+                  <q-item-section><strong>Sair</strong></q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
