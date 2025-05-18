@@ -1,24 +1,44 @@
 <template>
-  <div class="login-page">
-    <div class="login-container">
-      <div class="login-left">
+  <div class="signup-page">
+    <div class="signup-container">
+      <div class="signup-left">
         <div
           class="text-h5 text-primary q-mb-sm"
           style="font-weight: bold; font-size: 27px"
         >
-          SEJA BEM-VINDO
+          CRIAR CONTA
         </div>
         <div
           class="text-subtitle2 q-mb-lg"
           style="color: var(--gray-dark); font-size: 15px"
         >
-          Identifique-se Por favor para acessar a
+          Preencha os dados abaixo para criar sua conta na
           <strong>Minha Farmacinha</strong>
         </div>
-        <form @submit.prevent="handleLogin">
+        <form @submit.prevent="handleSignUp">
           <q-input
-            v-model="username"
-            label="Usuário"
+            v-model="name"
+            label="Nome Completo"
+            outlined
+            dense
+            class="q-mb-md"
+            color="blue"
+          />
+
+          <q-input
+            v-model="age"
+            label="Idade"
+            type="number"
+            outlined
+            dense
+            class="q-mb-md"
+            color="blue"
+          />
+
+          <q-input
+            v-model="email"
+            label="E-mail"
+            type="email"
             outlined
             dense
             class="q-mb-md"
@@ -31,32 +51,37 @@
             type="password"
             outlined
             dense
+            class="q-mb-md"
+            color="blue"
+          />
+
+          <q-input
+            v-model="confirmPassword"
+            label="Confirmar Senha"
+            type="password"
+            outlined
+            dense
             class="q-mb-lg"
             color="blue"
           />
 
           <div class="row q-gutter-sm">
             <q-btn
-              label="Entrar"
+              label="Cadastrar"
               type="submit"
               color="primary"
-              @click="handleLogin"
+              @click="handleSignUp"
             />
-            <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
-          </div>
-          <div class="text-center q-mt-md">
-            <span class="text-grey-7">Não tem uma conta? </span>
-            <router-link
-              to="/signup"
-              class="text-primary text-weight-medium"
-              style="text-decoration: none"
-            >
-              Cadastre-se
-            </router-link>
+            <q-btn
+              label="Cancelar"
+              color="negative"
+              class="q-ml-lg"
+              @click="goToLogin"
+            />
           </div>
         </form>
       </div>
-      <div class="login-right">
+      <div class="signup-right">
         <img
           src="../assets/image/logo-farmacinha.png"
           alt="Logo Minha Farmacinha"
@@ -69,32 +94,43 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import { useAuthStore } from "../stores/auth";
 import { useNotify } from "src/composables/useNotify";
 
-const username = ref("");
+const name = ref("");
+const age = ref("");
+const email = ref("");
 const password = ref("");
+const confirmPassword = ref("");
 const router = useRouter();
-const loginError = ref(false);
-const authStore = useAuthStore();
 const { success, error } = useNotify();
 
-const handleLogin = async () => {
-  console.log(username.value, password.value);
-  const user = authStore.login(username.value, password.value);
-  if (user) {
-    loginError.value = false;
-    success("Login realizado com sucesso!");
-    await router.push("/app/home");
-  } else {
-    loginError.value = true;
-    error("Usuário ou senha incorretos");
+const handleSignUp = async () => {
+  if (password.value !== confirmPassword.value) {
+    error("As senhas não coincidem!");
+    return;
   }
+
+  if (!name.value || !age.value || !email.value || !password.value) {
+    error("Por favor, preencha todos os campos!");
+    return;
+  }
+
+  try {
+    // Aqui você implementará a lógica de cadastro com sua API
+    success("Cadastro realizado com sucesso!");
+    await router.push("/");
+  } catch {
+    error("Erro ao realizar cadastro. Tente novamente.");
+  }
+};
+
+const goToLogin = async () => {
+  await router.push("/");
 };
 </script>
 
 <style scoped>
-.login-page {
+.signup-page {
   background: var(--blue-light);
   height: 100vh;
   display: flex;
@@ -102,7 +138,7 @@ const handleLogin = async () => {
   align-items: center;
 }
 
-.login-container {
+.signup-container {
   display: flex;
   width: 700px;
   border-radius: 50px;
@@ -111,8 +147,8 @@ const handleLogin = async () => {
   background: var(--white);
 }
 
-.login-left,
-.login-right {
+.signup-left,
+.signup-right {
   width: 50%;
   padding: 2rem;
   display: flex;
@@ -120,7 +156,7 @@ const handleLogin = async () => {
   justify-content: center;
 }
 
-.login-left {
+.signup-left {
   background: var(--white);
 }
 
@@ -132,13 +168,13 @@ input {
   border-radius: 8px;
 }
 
-.login-right {
+.signup-right {
   background: linear-gradient(135deg, var(--blue) 0%, var(--blue-dark) 100%);
   align-items: center;
   justify-content: center;
 }
 
-.login-right img {
+.signup-right img {
   max-width: 80%;
 }
 </style>

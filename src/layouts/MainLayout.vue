@@ -52,35 +52,35 @@
 
         <q-separator spaced color="grey-6" />
 
-        <q-item clickable to="/home" exact>
+        <q-item clickable to="/app/home" exact>
           <q-item-section avatar
             ><q-icon name="home" color="primary"
           /></q-item-section>
           <q-item-section>Início</q-item-section>
         </q-item>
 
-        <q-item clickable to="/medicines">
+        <q-item clickable to="/app/medicines">
           <q-item-section avatar
             ><q-icon name="medical_services" color="primary"
           /></q-item-section>
           <q-item-section>Medicamentos</q-item-section>
         </q-item>
 
-        <q-item clickable to="/shopping">
+        <q-item clickable to="/app/shopping">
           <q-item-section avatar
             ><q-icon name="shopping_cart" color="primary"
           /></q-item-section>
           <q-item-section>Compras</q-item-section>
         </q-item>
 
-        <q-item clickable to="/chat">
+        <q-item clickable to="/app/chat">
           <q-item-section avatar
             ><q-icon name="chat" color="primary"
           /></q-item-section>
           <q-item-section>Chat IA</q-item-section>
         </q-item>
 
-        <q-item clickable to="/profile">
+        <q-item clickable to="/app/profile">
           <q-item-section avatar
             ><q-icon name="person" color="primary"
           /></q-item-section>

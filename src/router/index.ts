@@ -5,6 +5,7 @@ import {
   createWebHashHistory,
   createWebHistory,
 } from 'vue-router';
+import { useAuthStore } from "../stores/auth";
 import routes from './routes';
 
 /*
@@ -29,6 +30,13 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> vueRouterMode
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
+  });
+  Router.beforeEach((to, from, next) => {
+    if (to.meta.requiresAuth && !useAuthStore()) { // isAuthenticated() seria sua função de verificação
+      next('/');
+    } else {
+      next();
+    }
   });
 
   return Router;
