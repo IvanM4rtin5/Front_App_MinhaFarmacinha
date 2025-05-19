@@ -1,4 +1,4 @@
-# Quasar App (farmacinha-front)
+# App (farmacinha-front)
 
 app pharma
 
