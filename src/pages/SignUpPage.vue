@@ -26,9 +26,9 @@
           />
 
           <q-input
-            v-model="age"
-            label="Idade"
-            type="number"
+            v-model="date"
+            label="Data de nascimento"
+            type="date"
             outlined
             dense
             class="q-mb-md"
@@ -97,7 +97,7 @@ import { useRouter } from "vue-router";
 import { useNotify } from "src/composables/useNotify";
 
 const name = ref("");
-const age = ref("");
+const date = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
@@ -110,13 +110,13 @@ const handleSignUp = async () => {
     return;
   }
 
-  if (!name.value || !age.value || !email.value || !password.value) {
+  if (!name.value || !date.value || !email.value || !password.value) {
     error("Por favor, preencha todos os campos!");
     return;
   }
 
   try {
-    // Aqui você implementará a lógica de cadastro com sua API
+
     success("Cadastro realizado com sucesso!");
     await router.push("/");
   } catch {
