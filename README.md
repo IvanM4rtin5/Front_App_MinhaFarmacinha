@@ -1,4 +1,4 @@
-# App (farmacinha-front)
+# App (farmacinha-front)- in developing
 
 app pharma
 
