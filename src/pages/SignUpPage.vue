@@ -16,6 +16,7 @@
           <strong>Minha Farmacinha</strong>
         </div>
         <form @submit.prevent="handleSignUp">
+          <!-- Nome -->
           <q-input
             v-model="name"
             label="Nome Completo"
@@ -23,18 +24,23 @@
             dense
             class="q-mb-md"
             color="blue"
+            :input-style="{ fontSize: '16px' }"
           />
 
+          <!-- Data de nascimento -->
           <q-input
             v-model="date"
-            label="Data de nascimento"
             type="date"
             outlined
             dense
             class="q-mb-md"
             color="blue"
-          />
+            :input-style="{ fontSize: '16px' }"
+          >
+            <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
+          </q-input>
 
+          <!-- Email -->
           <q-input
             v-model="email"
             label="E-mail"
@@ -43,8 +49,10 @@
             dense
             class="q-mb-md"
             color="blue"
+            :input-style="{ fontSize: '16px' }"
           />
 
+          <!-- Senha -->
           <q-input
             v-model="password"
             label="Senha"
@@ -53,8 +61,11 @@
             dense
             class="q-mb-md"
             color="blue"
+            :input-style="{ fontSize: '16px' }"
           />
 
+
+          <!-- Confirmar senha -->
           <q-input
             v-model="confirmPassword"
             label="Confirmar Senha"
@@ -63,19 +74,20 @@
             dense
             class="q-mb-lg"
             color="blue"
+            :input-style="{ fontSize: '16px' }"
           />
 
-          <div class="row q-gutter-sm">
+          <div class="row q-gutter-sm buttons-container">
             <q-btn
               label="Cadastrar"
               type="submit"
               color="primary"
-              @click="handleSignUp"
+              class="action-button"
             />
             <q-btn
               label="Cancelar"
               color="negative"
-              class="q-ml-lg"
+              class="action-button"
               @click="goToLogin"
             />
           </div>
@@ -115,8 +127,14 @@ const handleSignUp = async () => {
     return;
   }
 
-  try {
+  // Validação do formato da data dd/mm/aaaa
+  const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+  if (!dateRegex.test(date.value)) {
+    error("Data de nascimento inválida! Use o formato dd/mm/aaaa.");
+    return;
+  }
 
+  try {
     success("Cadastro realizado com sucesso!");
     await router.push("/");
   } catch {
@@ -132,15 +150,17 @@ const goToLogin = async () => {
 <style scoped>
 .signup-page {
   background: var(--blue-light);
-  height: 100vh;
+  min-height: 100vh;
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 1rem;
 }
 
 .signup-container {
   display: flex;
   width: 700px;
+  max-width: 100%;
   border-radius: 50px;
   box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
   overflow: hidden;
@@ -177,4 +197,36 @@ input {
 .signup-right img {
   max-width: 80%;
 }
+
+.buttons-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1rem;
+  justify-content: flex-start;
+  margin-top: 1rem;
+}
+
+.action-button {
+  min-width: 120px;
+}
+
+@media (max-width: 600px) {
+  .signup-container {
+    width: 100%;
+    flex-direction: column;
+    border-radius: 25px;
+  }
+
+  .signup-left,
+  .signup-right {
+    width: 100%;
+    padding: 1.5rem;
+  }
+
+  .buttons-container {
+    justify-content: center;
+  }
+}
+
+
 </style>

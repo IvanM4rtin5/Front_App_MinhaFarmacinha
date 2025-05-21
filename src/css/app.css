@@ -56,3 +56,15 @@ button {
   opacity: 0.6;
   cursor: not-allowed;
 }
+.q-tooltip {
+  font-size: 14px;  
+  padding: 14px 20px;
+  max-width: 150px;
+  text-align: center;
+  background: transparent;
+  color: var(--gray-dark);
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  font-weight: 500;
+  letter-spacing: 0.5px;
+}
