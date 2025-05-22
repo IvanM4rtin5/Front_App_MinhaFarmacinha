@@ -68,3 +68,6 @@ button {
   font-weight: 500;
   letter-spacing: 0.5px;
 }
+.q-tooltip-arrow {
+  display: none;
+}

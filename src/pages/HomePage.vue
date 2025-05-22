@@ -3,7 +3,17 @@
       <div class="row items-center q-mb-lg">
         <div class="col">
           <h5 class="text-primary">Minha Farmacinha <q-icon name="chevron_right" />Resumo do Dia</h5>
-          <p @click="handleUserClick" class="text-grey-7" style="cursor: pointer;">Bem-vindo {{ name }}</p>
+          <p 
+          @click="handleUserClick" 
+          class="text-grey-7" 
+          style="cursor: pointer;
+          display: inline-block;"
+          >
+          Bem-vindo {{ name }}
+          <q-tooltip 
+          style="top: -6px;" >
+            Clique para ver seu perfil</q-tooltip>
+          </p> 
         </div>
       </div>
   
@@ -63,7 +73,7 @@
   const name = ref(localStorage.getItem('name') || 'Visitante');
   
   const handleUserClick = () => {
-    void router.push('/profile');
+    void router.push('/app/profile');
   };
   
   </script>
