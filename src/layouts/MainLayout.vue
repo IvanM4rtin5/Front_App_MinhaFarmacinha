@@ -8,24 +8,31 @@
           dense
           round
           icon="menu"
+          size="lg"
           aria-label="Menu"
           @click="toggleLeftDrawer"
         />
-        <q-avatar class="q-ml-sm">
-          <q-icon name="local_pharmacy" color="primary" />
-        </q-avatar>
-        <q-toolbar-title> Minha Farmacinha </q-toolbar-title>
+
+        <q-toolbar-title class="text-h5">
+          Minha Farmacinha
+          <q-avatar color="primary" text-color="white" size="50px">
+            <q-icon name="health_and_safety" />
+          </q-avatar>
+        </q-toolbar-title>
+
+        <div class="row items-center">
+          <NotificationsDropdown />
+          <q-tooltip>Notificações</q-tooltip>
+        </div>
       </q-toolbar>
     </q-header>
     <!-- Menu lateral -->
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list padding class="text-white">
-
         <!-- Usuário (avatar + nome + menu) -->
         <div class="q-mt-xl q-mb-md flex flex-center column">
           <q-avatar size="56px" color="primary" text-color="white">
-            {{ name?.[0]?.toUpperCase() + (name?.[1] ?? '') || '?' }}
-            <!-- <q-icon name="person" /> -->
+            {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
           </q-avatar>
 
           <div class="q-mt-sm text-subtitle2 text-white text-center">
@@ -34,7 +41,7 @@
 
           <q-btn dense flat color="primary" label="Opções" class="q-mt-sm">
             <q-menu transition-show="rotate" transition-hide="rotate">
-              <q-list style="min-width: 90px; color: var(--gray-dark);">
+              <q-list style="min-width: 90px; color: var(--gray-dark)">
                 <q-item clickable>
                   <q-item-section>Configurações</q-item-section>
                 </q-item>
@@ -101,6 +108,7 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
+import NotificationsDropdown from "components/NotificationsDropdown.vue";
 
 const router = useRouter();
 const leftDrawerOpen = ref(false);

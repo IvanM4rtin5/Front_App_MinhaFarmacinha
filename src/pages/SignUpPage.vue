@@ -64,7 +64,6 @@
             :input-style="{ fontSize: '16px' }"
           />
 
-
           <!-- Confirmar senha -->
           <q-input
             v-model="confirmPassword"
@@ -82,6 +81,7 @@
               label="Cadastrar"
               type="submit"
               color="primary"
+              @click="handleSignUp"
               class="action-button"
             />
             <q-btn
@@ -127,10 +127,10 @@ const handleSignUp = async () => {
     return;
   }
 
-  // Validação do formato da data dd/mm/aaaa
-  const dateRegex = /^\d{2}\/\d{2}\/\d{4}$/;
+  // Validação do formato da data YYYY-MM-DD
+  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(date.value)) {
-    error("Data de nascimento inválida! Use o formato dd/mm/aaaa.");
+    error("Data de nascimento inválida!");
     return;
   }
 
@@ -227,6 +227,4 @@ input {
     justify-content: center;
   }
 }
-
-
 </style>
