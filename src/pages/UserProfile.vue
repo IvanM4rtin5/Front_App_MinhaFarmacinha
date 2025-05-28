@@ -13,13 +13,19 @@
       <div class="profile-header q-mb-lg">
         <div class="profile-avatar">
           <q-avatar size="56px" color="primary" text-color="white">
-            {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
+            <img v-if="avatarPreview" :src="avatarPreview" />
+            <template v-else>
+              {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
+            </template>
           </q-avatar>
           <q-btn
-           round flat icon="edit" size="sm" 
-           class="edit-avatar-btn q-mt-sm" 
-           @click="handleAvatarUpload"
-           />
+            round
+            flat
+            icon="edit"
+            size="sm"
+            class="edit-avatar-btn q-mt-sm"
+            @click="handleAvatarUpload"
+          />
         </div>
         <div class="profile-info">
           <h1>{{ name || "Usuário" }}</h1>
@@ -85,17 +91,23 @@
   /*Modal*/
   <q-dialog v-model="layout">
     <q-card style="min-width: 600px">
-      <q-card-section class="row items-center" style="background-color: var(--blue);">
-        <div class="text-h6 " style="color: aquamarine;">Editar Perfil</div>
+      <q-card-section
+        class="row items-center"
+        style="background-color: var(--blue)"
+      >
+        <div class="text-h6" style="color: aquamarine">Editar Perfil</div>
       </q-card-section>
 
       <q-card-section>
         <div class="column items-center q-mb-md">
-          <q-avatar size="100px" color="primary" style="color:aquamarine ;">
-            {{
-              formData.name?.[0]?.toUpperCase() + (formData.name?.[1] ?? "") ||
-              "?"
-            }}
+          <q-avatar size="100px" color="primary" style="color: aquamarine">
+            <img v-if="avatarPreview" :src="avatarPreview" />
+            <template v-else>
+              {{
+                formData.name?.[0]?.toUpperCase() +
+                  (formData.name?.[1] ?? "") || "?"
+              }}
+            </template>
           </q-avatar>
         </div>
 
@@ -123,12 +135,9 @@
               flat
               v-close-popup
               class="q-mr-sm"
-              style="background-color: red;"
+              style="background-color: red"
             />
-            <q-btn 
-            label="Salvar" 
-            type="submit" 
-            color="primary" />
+            <q-btn label="Salvar" type="submit" color="primary" />
           </div>
         </q-form>
       </q-card-section>
@@ -150,14 +159,30 @@ const formData = ref({
   email: typeof user.value === "object" && user.value ? user.value.email : "",
 });
 
+const avatarPreview = ref<string | null>(null);
+
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
 
 const handleAvatarUpload = () => {
-  // Falta Implementar lógica de upload de avatar
-  console.log("Upload avatar");
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = "image/*";
+
+  input.onchange = (event) => {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (file) {
+      // Criar preview da imagem
+      avatarPreview.value = URL.createObjectURL(file);
+
+      // Aqui vou implementar a logiga para e atulizar o avatr no servidor
+      // await uploadImage(file);
+    }
+  };
+
+  input.click();
 };
 
 const onSubmit = () => {
