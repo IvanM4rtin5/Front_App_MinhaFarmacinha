@@ -66,6 +66,7 @@
           color="primary"
           icon="edit"
           label="Editar Perfil"
+          @click="layout = true"
         />
         <q-btn
           class="action-btn"
@@ -76,14 +77,100 @@
       </div>
     </div>
   </q-page>
+
+  /*Modal*/
+  <q-dialog v-model="layout">
+    <q-card style="min-width: 350px">
+      <q-card-section class="row items-center">
+        <div class="text-h6">Editar Perfil</div>
+        <q-space />
+        <q-btn icon="close" flat round dense v-close-popup />
+      </q-card-section>
+
+      <q-card-section>
+        <div class="column items-center q-mb-md">
+          <q-avatar size="100px" color="primary" text-color="white">
+            {{
+              formData.name?.[0]?.toUpperCase() + (formData.name?.[1] ?? "") ||
+              "?"
+            }}
+          </q-avatar>
+          <q-btn
+            round
+            flat
+            icon="edit"
+            size="sm"
+            class="edit-avatar-btn q-mt-sm"
+            @click="handleAvatarUpload"
+          />
+        </div>
+
+        <q-form @submit="onSubmit" class="q-gutter-md">
+          <q-input
+            v-model="formData.name"
+            label="Nome"
+            :rules="[(val) => !!val || 'Nome é obrigatório']"
+          />
+
+          <q-input
+            v-model="formData.email"
+            label="Email"
+            type="email"
+            :rules="[
+              (val) => !!val || 'Email é obrigatório',
+              (val) => isValidEmail(val) || 'Email inválido',
+            ]"
+          />
+
+          <div class="row justify-end q-mt-md">
+            <q-btn
+              label="Cancelar"
+              color="grey-7"
+              flat
+              v-close-popup
+              class="q-mr-sm"
+            />
+            <q-btn label="Salvar" type="submit" color="primary" />
+          </div>
+        </q-form>
+      </q-card-section>
+    </q-card>
+  </q-dialog>
 </template>
 
 <script setup lang="ts">
+import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
 
 const authStore = useAuthStore();
 const { name, user } = storeToRefs(authStore);
+
+const layout = ref(false);
+const formData = ref({
+  name: name.value,
+  email: typeof user.value === "object" && user.value ? user.value.email : "",
+});
+
+const isValidEmail = (email: string) => {
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  return emailRegex.test(email);
+};
+
+const handleAvatarUpload = () => {
+  // Implementar lógica de upload de avatar
+  console.log("Upload avatar");
+};
+
+const onSubmit = async () => {
+  try {
+    // Aqui você implementará a lógica para salvar as alterações
+    // await authStore.updateProfile(formData.value);
+    layout.value = false;
+  } catch (error) {
+    console.error("Erro ao atualizar perfil:", error);
+  }
+};
 </script>
 
 <style scoped>

@@ -127,6 +127,13 @@ const handleSignUp = async () => {
     return;
   }
 
+  // Validação do email
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+  if (!emailRegex.test(email.value)) {
+    error("Por favor, insira um email válido!");
+    return;
+  }
+
   // Validação do formato da data YYYY-MM-DD
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(date.value)) {
@@ -135,7 +142,7 @@ const handleSignUp = async () => {
   }
 
   try {
-    success("Cadastro realizado com sucesso!");
+    success("Usuário cadastrado com sucesso!");
     await router.push("/");
   } catch {
     error("Erro ao realizar cadastro. Tente novamente.");
