@@ -29,6 +29,7 @@
             v-model="password"
             label="Senha"
             type="password"
+            autocomplete="current-password"
             outlined
             dense
             class="q-mb-lg"

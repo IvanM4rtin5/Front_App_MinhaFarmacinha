@@ -32,7 +32,10 @@
         <!-- Usuário (avatar + nome + menu) -->
         <div class="q-mt-xl q-mb-md flex flex-center column">
           <q-avatar size="56px" color="primary" text-color="white">
-            {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
+            <img v-if="avatarUrl" :src="avatarUrl" />
+            <template v-else>
+              {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
+            </template>
           </q-avatar>
 
           <div class="q-mt-sm text-subtitle2 text-white text-center">
@@ -112,16 +115,17 @@ import NotificationsDropdown from "components/NotificationsDropdown.vue";
 
 const router = useRouter();
 const leftDrawerOpen = ref(false);
+const authStore = useAuthStore();
+const { name, user, avatarUrl } = storeToRefs(authStore);
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
 }
-const authStore = useAuthStore();
-const { name, user } = storeToRefs(authStore);
 
 function handleUserClick() {
   if (user.value) {
     authStore.logout();
+    console.log("Redirecionando para /");
     void router.push("/");
   }
 }

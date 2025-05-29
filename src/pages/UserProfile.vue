@@ -13,7 +13,7 @@
       <div class="profile-header q-mb-lg">
         <div class="profile-avatar">
           <q-avatar size="56px" color="primary" text-color="white">
-            <img v-if="avatarPreview" :src="avatarPreview" />
+            <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
             </template>
@@ -101,7 +101,7 @@
       <q-card-section>
         <div class="column items-center q-mb-md">
           <q-avatar size="100px" color="primary" style="color: aquamarine">
-            <img v-if="avatarPreview" :src="avatarPreview" />
+            <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{
                 formData.name?.[0]?.toUpperCase() +
@@ -151,15 +151,13 @@ import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
 
 const authStore = useAuthStore();
-const { name, user } = storeToRefs(authStore);
+const { name, user, avatarUrl } = storeToRefs(authStore);
 
 const layout = ref(false);
 const formData = ref({
   name: name.value,
   email: typeof user.value === "object" && user.value ? user.value.email : "",
 });
-
-const avatarPreview = ref<string | null>(null);
 
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -174,11 +172,8 @@ const handleAvatarUpload = () => {
   input.onchange = (event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      // Criar preview da imagem
-      avatarPreview.value = URL.createObjectURL(file);
-
-      // Aqui vou implementar a logiga para e atulizar o avatr no servidor
-      // await uploadImage(file);
+      const avatarUrl = URL.createObjectURL(file);
+      authStore.setAvatar(avatarUrl); // Salva no store
     }
   };
 
