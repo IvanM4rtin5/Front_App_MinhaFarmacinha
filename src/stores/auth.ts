@@ -1,6 +1,5 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
 
-
 interface User {
   name: string;
   email: string;
@@ -57,11 +56,29 @@ export const useAuthStore = defineStore("auth", {
       localStorage.removeItem("name");
       localStorage.removeItem("user");
       localStorage.removeItem("avatarUrl");
-
     },
 
-    setAvatar(url: string | null) {
-      this.avatarUrl = url;
+    setAvatar(file: File) {
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        const base64 = e.target?.result as string;
+        this.avatarUrl = base64;
+        localStorage.setItem("avatarUrl", base64);
+      };
+      reader.readAsDataURL(file);
+    },
+
+    updateProfile(profileData: { name: string; email: string }) {
+      this.name = profileData.name;
+      if (this.user && typeof this.user === "object") {
+        this.user = {
+          ...this.user,
+          email: profileData.email,
+        };
+      }
+
+      localStorage.setItem("name", profileData.name);
+      localStorage.setItem("user", JSON.stringify(this.user));
     },
   },
 });

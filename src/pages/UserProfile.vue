@@ -172,8 +172,7 @@ const handleAvatarUpload = () => {
   input.onchange = (event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      const avatarUrl = URL.createObjectURL(file);
-      authStore.setAvatar(avatarUrl); // Salva no store
+      authStore.setAvatar(file);
     }
   };
 
@@ -182,8 +181,10 @@ const handleAvatarUpload = () => {
 
 const onSubmit = () => {
   try {
-    // lógica para salvar as alterações
-    // await authStore.updateProfile(formData.value);
+    authStore.updateProfile({
+      name: formData.value.name,
+      email: formData.value.email,
+    });
     layout.value = false;
   } catch (error) {
     console.error("Erro ao atualizar perfil:", error);
