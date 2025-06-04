@@ -12,7 +12,6 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/app",
     component: () => import("layouts/MainLayout.vue"),
-    beforeEnter: authMiddleware,
     children: [
       {
         path: "home",
