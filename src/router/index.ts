@@ -31,13 +31,21 @@ export default defineRouter(function (/* { store, ssrContext } */) {
     // quasar.conf.js -> build -> publicPath
     history: createHistory(process.env.VUE_ROUTER_BASE),
   });
-  Router.beforeEach((to, from, next) => {
-    if (to.meta.requiresAuth && !useAuthStore()) { // isAuthenticated() seria sua função de verificação
-      next('/');
-    } else {
-      next();
-    }
-  });
+  
+Router.beforeEach((to, from, next) => {
+  const authStore = useAuthStore();
+  const token = localStorage.getItem("token");
+
+  if (to.meta.requiresAuth && (!authStore.user || !token)) {
+    return next('/');
+  }
+
+  if ((to.path === '/' || to.path === '/signup') && authStore.user && token) {
+    return next('/app/home');
+  }
+
+  next();
+});
 
   return Router;
 });

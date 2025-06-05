@@ -1,6 +1,9 @@
 import { defineStore, acceptHMRUpdate } from "pinia";
+import { api } from "src/boot/axios";
+import type { AxiosError } from "axios";
 
 interface User {
+  id: number;
   name: string;
   email: string;
 }
@@ -25,27 +28,56 @@ export const useAuthStore = defineStore("auth", {
   },
 
   actions: {
-    login(username: string, password: string): User | false {
-      if (username === "admim" && password === "admim") {
-        const user: User = {
-          name: "Administrador",
-          email: "admim@admim.com",
-        };
+    async login(username: string, password: string): Promise<User | false> {
+      try {
+        const response = await api.post("/auth/login", {
+          username: username,
+          password: password,
+        });
 
-        this.user = user;
-        this.name = user.name;
+        if (response.data?.access_token) {
+          localStorage.setItem("token", response.data.access_token);
+          api.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
 
-        localStorage.setItem("user", JSON.stringify(user));
-        localStorage.setItem("name", user.name);
+          try {
+            const tokenPayload = JSON.parse(atob(response.data.access_token.split('.')[1]));
+            const userId = tokenPayload.sub; 
+            const userResponse = await api.get(`/users/${userId}`);
+            const userData = userResponse.data;
 
-        return user;
-      } else {
-        this.user = false;
-        this.name = "";
-        localStorage.removeItem("user");
-        localStorage.removeItem("name");
-        return false;
+            const user: User = {
+              id: userData.id,
+              name: userData.username,
+              email: userData.email,
+            };
+
+            this.user = user;
+            this.name = user.name;
+
+            localStorage.setItem("user", JSON.stringify(user));
+            localStorage.setItem("name", user.name);
+
+            return user;
+          } catch (error) {
+            console.error("Erro ao buscar dados do usuário:", error);
+            throw error;
+          }
+        }
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        console.error(
+          "Erro ao fazer login:",
+          axiosError.response?.data || axiosError.message
+        );
+        throw error;
       }
+
+      this.user = false;
+      this.name = "";
+      localStorage.removeItem("user");
+      localStorage.removeItem("name");
+      localStorage.removeItem("token");
+      return false;
     },
 
     logout() {
@@ -55,7 +87,10 @@ export const useAuthStore = defineStore("auth", {
 
       localStorage.removeItem("name");
       localStorage.removeItem("user");
+      localStorage.removeItem("token");
       localStorage.removeItem("avatarUrl");
+      
+      delete api.defaults.headers.common["Authorization"];
     },
 
     setAvatar(file: File) {

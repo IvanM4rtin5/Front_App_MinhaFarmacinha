@@ -1,5 +1,4 @@
 import type { RouteRecordRaw } from "vue-router";
-import { authMiddleware } from "./middleware/auth";
 
 const routes: RouteRecordRaw[] = [
   {
@@ -13,13 +12,32 @@ const routes: RouteRecordRaw[] = [
   {
     path: "/app",
     component: () => import("layouts/MainLayout.vue"),
-    beforeEnter: authMiddleware,
     children: [
-      { path: "home", component: () => import("pages/HomePage.vue") },
-      { path: "profile", component: () => import("pages/UserProfile.vue") },
-      { path: "medicines", component: () => import("pages/MedicineList.vue") },
-      { path: "shopping", component: () => import("pages/ShoppingList.vue") },
-      { path: "chat", component: () => import("pages/ChatAssistant.vue") },
+      {
+        path: "home",
+        component: () => import("pages/HomePage.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "profile",
+        component: () => import("pages/UserProfile.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "medicines",
+        component: () => import("pages/MedicineList.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "shopping",
+        component: () => import("pages/ShoppingList.vue"),
+        meta: { requiresAuth: true },
+      },
+      {
+        path: "chat",
+        component: () => import("pages/ChatAssistant.vue"),
+        meta: { requiresAuth: true },
+      },  
     ],
   },
   {

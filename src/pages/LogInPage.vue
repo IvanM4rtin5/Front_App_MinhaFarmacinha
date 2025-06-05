@@ -23,6 +23,7 @@
             dense
             class="q-mb-md"
             color="blue"
+            autocomplete="username"
           />
 
           <q-input
@@ -82,14 +83,20 @@ const { success, error } = useNotify();
 
 const handleLogin = async () => {
   console.log(username.value, password.value);
-  const user = authStore.login(username.value, password.value);
-  if (user) {
-    loginError.value = false;
-    success("Login realizado com sucesso!");
-    await router.push("/app/home");
-  } else {
+  try {
+    const user = await authStore.login(username.value, password.value);
+    if (user) {
+      loginError.value = false;
+      success("Login realizado com sucesso!");
+      await router.push("/app/home");
+    } else {
+      loginError.value = true;
+      error("Usuário ou senha incorretos");
+    }
+  } catch (err) {
     loginError.value = true;
-    error("Usuário ou senha incorretos");
+    error("Erro ao realizar login. Por favor Tente novamente.");
+    console.error("Erro no login:", err);
   }
 };
 </script>
