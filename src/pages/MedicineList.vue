@@ -2,14 +2,18 @@
   <q-page padding>
     <div class="row items-center q-mb-lg">
       <div class="col">
-        <h5 class="text-primary">Minha Farmacinha <q-icon name="chevron_right" /> Meus Medicamentos</h5>
-        <p class="text-grey-7">Lista de medicamentos que estou utilizando atualmente.</p>
+        <h5 class="text-primary">
+          Minha Farmacinha <q-icon name="chevron_right" /> Meus Medicamentos
+        </h5>
+        <p class="text-grey-7">
+          Lista de medicamentos que estou utilizando atualmente.
+        </p>
       </div>
       <div class="col-auto">
-        <q-btn 
-          color="negative" 
-          icon="add" 
-          label="Adicionar Medicamento" 
+        <q-btn
+          color="negative"
+          icon="add"
+          label="Adicionar Medicamento"
           @click="openAddDialog"
           class="q-px-md"
         />
@@ -19,11 +23,11 @@
     <div class="row q-mb-md q-col-gutter-md">
       <div class="col-md-6 col-12">
         <q-input
-          outlined
-          dense
-          placeholder="Buscar medicamento..."
           v-model="search"
-          class="bg-white"
+          dense
+          outlined
+          placeholder="Buscar medicamentos..."
+          class="q-mr-md"
         >
           <template v-slot:append>
             <q-icon name="search" />
@@ -31,25 +35,16 @@
         </q-input>
       </div>
       <div class="col-md-6 col-12">
-        <div class="row q-col-gutter-md">
-          <div class="col">
-            <q-select
-              outlined
-              dense
-              v-model="selectedGroup"
-              :options="groupOptions"
-              placeholder="- Selecionar Categoria -"
-              class="bg-white"
-            >
-              <template v-slot:append>
-                <q-icon name="expand_more" />
-              </template>
-            </q-select>
-          </div>
-          <div class="col-auto">
-            <q-btn flat dense icon="filter_list" class="q-px-sm bg-white" />
-          </div>
-        </div>
+        <q-select
+          v-model="selectedGroup"
+          :options="groupOptions"
+          dense
+          outlined
+          label="Filtrar por grupo"
+          emit-value
+          map-options
+          clearable
+        />
       </div>
     </div>
 
@@ -58,202 +53,163 @@
         :rows="medicines"
         :columns="columns"
         row-key="id"
-        v-model:pagination="pagination"
         :loading="loading"
-        flat
-        bordered
+        :filter="search"
+        v-model:pagination="pagination"
+        :rows-per-page-options="[10, 20, 50, 0]"
+        class="my-sticky-header-table"
       >
-        <template v-slot:header="props">
-          <q-tr :props="props">
-            <q-th v-for="col in props.cols" :key="col.name" :props="props">
-              {{ col.label }}
-              <q-icon name="unfold_more" size="sm" class="q-ml-xs" />
-            </q-th>
-          </q-tr>
+        <template v-slot:loading>
+          <q-inner-loading showing color="primary" />
         </template>
-        <template v-slot:body="props">
-          <q-tr :props="props">
-            <q-td key="name" :props="props">
-              <div class="row items-center">
-                <q-icon :name="props.row.icon || 'medication'" color="primary" size="sm" class="q-mr-sm" />
-                {{ props.row.name }}
-              </div>
-            </q-td>
-            <q-td key="dosage" :props="props">{{ props.row.dosage }}</q-td>
-            <q-td key="category" :props="props">{{ props.row.category }}</q-td>
-            <q-td key="frequency" :props="props">{{ props.row.frequency }}</q-td>
-            <q-td key="schedules" :props="props">
-              <div class="row items-center">
-                <q-chip 
-                  v-for="(time, index) in props.row.schedules" 
-                  :key="index" 
-                  size="sm" 
-                  color="blue-1" 
-                  text-color="primary"
-                  class="q-mr-xs"
-                >
-                  <q-icon name="schedule" size="xs" class="q-mr-xs" />
-                  {{ time }}
-                </q-chip>
-              </div>
-            </q-td>
-            <q-td key="stock" :props="props">
-              <q-badge :color="getStockColor(props.row.stock)">{{ props.row.stock }}</q-badge>
-            </q-td>
-            <q-td key="action" :props="props" class="q-gutter-x-sm">
-              <q-btn size="sm" flat round color="primary" icon="edit" @click="editMedicine(props.row)" />
-              <q-btn size="sm" flat round color="negative" icon="delete" @click="confirmDelete(props.row)" />
-            </q-td>
-          </q-tr>
+
+        <template v-slot:body-cell-status="props">
+          <q-td :props="props">
+            <q-chip
+              :color="getStatusColor(props.row)"
+              text-color="white"
+              dense
+              class="q-ml-sm"
+            >
+              {{ props.row.status }}
+            </q-chip>
+          </q-td>
         </template>
-        <template v-slot:no-data>
-          <div class="full-width row flex-center q-pa-md text-grey-7">
-            <q-icon name="medication_liquid" size="2rem" class="q-mb-sm" />
-            <div>Nenhum medicamento encontrado. Adicione seu primeiro medicamento!</div>
-          </div>
+
+        <template v-slot:body-cell-schedules="props">
+          <q-td :props="props">
+            {{ props.row.schedules.join(" - ") }}
+          </q-td>
+        </template>
+
+        <template v-slot:body-cell-actions="props">
+          <q-td :props="props" class="q-gutter-sm">
+            <q-btn
+              flat
+              round
+              color="primary"
+              icon="edit"
+              @click="editMedicine(props.row)"
+            >
+            </q-btn>
+            <q-btn
+              flat
+              round
+              color="negative"
+              icon="delete"
+              @click="confirmDelete(props.row)"
+            >
+            </q-btn>
+          </q-td>
         </template>
       </q-table>
     </q-card>
 
-    <!-- Dialog para adicionar/editar medicamento -->
+    <!-- Button of add medicine -->
+    <q-page-sticky position="bottom-right" :offset="[18, 18]">
+      <q-btn
+        fab
+        icon="add"
+        color="primary"
+        @click="
+          () => {
+            resetForm();
+            medicineDialog = true;
+          }
+        "
+      />
+    </q-page-sticky>
+
+    <!-- Diálog of medicine -->
     <q-dialog v-model="medicineDialog" persistent>
-      <q-card style="width: 600px; max-width: 100vw; padding-left: 5px;">
-        <q-card-section class="row items-center" style="background-color: var(--gray-dark); color: var(--white); margin-left: -5px;">
-          <div class="text-h6 ">{{ isEditing ? 'Editar Medicamento' : 'Adicionar Novo Medicamento' }}</div>
-          <q-space />
-          <q-btn icon="close" flat round dense v-close-popup />
+      <q-card class="bg-grey-2" style="width: 80vw; max-width: 800px">
+        <q-card-section class="row items-center bg-primary text-white">
+          <div class="text-h6" style="flex: 1; text-align: center">
+            {{ isEditing ? "Editar" : "Adicionar" }} Medicamento
+          </div>
         </q-card-section>
 
-        <q-separator />
-
-        <q-card-section class="q-pt-md">
+        <q-card-section class="q-pt-lg">
           <q-form @submit="saveMedicine" class="q-gutter-md">
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <q-input 
-                  v-model="newMedicine.name" 
-                  label="Nome do Medicamento" 
-                  outlined 
-                  :rules="[val => !!val || 'Campo obrigatório']"
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input 
-                  v-model="newMedicine.dosage" 
-                  label="Dosagem (ex: 500mg, 10ml)" 
-                  outlined 
-                  :rules="[val => !!val || 'Campo obrigatório']"
-                />
-              </div>
-            </div>
-
-            <div class="row q-col-gutter-md">
-              <div class="col-12 col-md-6">
-                <q-select 
-                  v-model="newMedicine.category" 
-                  :options="categoryOptions" 
-                  label="Categoria" 
-                  outlined 
-                  :rules="[val => !!val || 'Selecione uma categoria']"
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-select 
-                  v-model="newMedicine.frequency" 
-                  :options="frequencyOptions" 
-                  label="Frequência de Uso" 
-                  outlined 
-                  :rules="[val => !!val || 'Selecione a frequência']"
-                />
-              </div>
-            </div>
-
-            <q-card bordered class="q-pa-md">
-              <div class="text-subtitle2 q-mb-md">Horários de Medicação</div>
-              <div class="row q-col-gutter-md">
-                <div class="col-9">
-                  <q-time
-                    v-model="currentTime"
-                    format24h
-                    mask="HH:mm"
-                    outlined
-                    class="full-width"
-                  />
-                </div>
-                <div class="col-3">
-                  <q-btn 
-                    color="primary" 
-                    icon="add" 
-                    label="Adicionar" 
-                    class="full-width"
-                    @click="addSchedule"
-                  />
-                </div>
-              </div>
-              
-              <div class="q-mt-md">
-                <q-list bordered separator>
-                  <q-item v-for="(time, index) in newMedicine.schedules" :key="index">
-                    <q-item-section>
-                      <div class="row items-center">
-                        <q-icon name="schedule" color="primary" class="q-mr-sm" />
-                        {{ time }}
-                      </div>
-                    </q-item-section>
-                    <q-item-section side>
-                      <q-btn size="sm" flat round dense color="negative" icon="remove_circle" @click="removeSchedule(index)" />
-                    </q-item-section>
-                  </q-item>
-                  <q-item v-if="newMedicine.schedules.length === 0">
-                    <q-item-section class="text-grey">
-                      Nenhum horário adicionado
-                    </q-item-section>
-                  </q-item>
-                </q-list>
-              </div>
-            </q-card>
-
-            <div class="row q-col-gutter-md q-mt-md">
-              <div class="col-12 col-md-6">
-                <q-input 
-                  v-model="newMedicine.stock" 
-                  label="Quantidade disponível" 
-                  type="number" 
-                  outlined 
-                  :rules="[val => val >= 0 || 'Quantidade não pode ser negativa']"
-                />
-              </div>
-              <div class="col-12 col-md-6">
-                <q-input 
-                  v-model="newMedicine.duration" 
-                  label="Duração do tratamento (dias)" 
-                  type="number" 
-                  outlined 
-                  hint="Deixe em branco para uso contínuo"
-                />
-              </div>
-            </div>
-
-            <q-input 
-              v-model="newMedicine.notes" 
-              label="Observações" 
-              type="textarea" 
-              outlined 
-              hint="Instruções especiais, restrições, etc."
+            <q-input
+              v-model="newMedicine.name"
+              label="Nome do medicamento"
+              :rules="[(val) => !!val || 'Nome é obrigatório']"
+              outlined
             />
+
+            <q-input
+              v-model="newMedicine.dosage"
+              label="Dosagem"
+              :rules="[(val) => !!val || 'Dosagem é obrigatória']"
+              outlined
+            />
+
+            <q-select
+              v-model="newMedicine.category"
+              :options="categoryOptions"
+              label="Categoria"
+              :rules="[(val) => !!val || 'Categoria é obrigatória']"
+              outlined
+              emit-value
+              map-options
+            />
+
+            <q-select
+              v-model="newMedicine.frequency"
+              :options="frequencyOptions"
+              label="Frequência"
+              :rules="[(val) => !!val || 'Frequência é obrigatória']"
+              outlined
+              emit-value
+              map-options
+            />
+
+            <q-input
+              v-model.number="newMedicine.stock"
+              type="number"
+              label="Quantidade em estoque"
+              :rules="[
+                (val) => val >= 0 || 'Quantidade não pode ser negativa',
+                (val) => !!val || 'Quantidade é obrigatória',
+              ]"
+              outlined
+            />
+
+            <div class="text-subtitle2 q-mb-sm">Horários de medicação</div>
+            <div class="row q-col-gutter-sm">
+              <div
+                v-for="(schedule, index) in newMedicine.schedules"
+                :key="index"
+                class="col-12 col-sm-6"
+              >
+                <q-input
+                  v-model="newMedicine.schedules[index]"
+                  type="time"
+                  outlined
+                  dense
+                  :label="`Horário ${index + 1}`"
+                />
+              </div>
+            </div>
+
+            <div class="row justify-end q-mt-md">
+              <q-btn
+                label="Cancelar"
+                color="white"
+                style="background-color: red"
+                flat
+                v-close-popup
+                class="q-mr-sm"
+              />
+              <q-btn label="Salvar" type="submit" color="primary" />
+            </div>
           </q-form>
         </q-card-section>
-
-        <q-separator />
-
-        <q-card-actions align="right">
-          <q-btn flat label="Cancelar" color="grey-7" v-close-popup />
-          <q-btn label="Salvar" color="primary" @click="saveMedicine" />
-        </q-card-actions>
       </q-card>
     </q-dialog>
 
-    <!-- Dialog de confirmação para excluir -->
+    <!-- Dialog of confirmation to remove -->
     <q-dialog v-model="deleteDialog" persistent>
       <q-card>
         <q-card-section class="row items-center">
@@ -263,13 +219,21 @@
 
         <q-card-section>
           <span v-if="medicineToDelete">
-            Tem certeza que deseja excluir o medicamento "{{ medicineToDelete.name }}"?
+            Tem certeza que deseja excluir o medicamento "{{
+              medicineToDelete.name
+            }}"?
           </span>
         </q-card-section>
 
         <q-card-actions align="right">
           <q-btn flat label="Cancelar" color="primary" v-close-popup />
-          <q-btn flat label="Excluir" color="negative" @click="deleteMedicine" v-close-popup />
+          <q-btn
+            flat
+            label="Excluir"
+            color="negative"
+            @click="deleteMedicine"
+            v-close-popup
+          />
         </q-card-actions>
       </q-card>
     </q-dialog>
@@ -277,9 +241,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue';
+import { ref, reactive, watch, onMounted } from "vue";
+import { api } from "src/boot/axios";
+import type { AxiosError } from "axios";
+import { useNotify } from "src/composables/useNotify";
 
-// Definição de tipos
 interface Medicine {
   id: number;
   name: string;
@@ -288,153 +254,149 @@ interface Medicine {
   frequency: string;
   schedules: string[];
   stock: number;
-  duration: number | null;
-  notes: string;
-  icon: string;
+  status: string;
 }
 
-// Dados para a tabela
+interface MedicineForm {
+  id: number;
+  name: string;
+  dosage: string;
+  category: string;
+  frequency: string;
+  schedules: string[];
+  stock: number;
+}
+
 const loading = ref(false);
-const search = ref('');
+const search = ref("");
 const selectedGroup = ref<string | null>(null);
-const currentTime = ref('08:00');
 const isEditing = ref(false);
 const medicineToDelete = ref<Medicine | null>(null);
 const medicineDialog = ref(false);
 const deleteDialog = ref(false);
+const { success, error } = useNotify();
 
-// Opções para os selects
+// Options for the selects
 const groupOptions = [
-  '- Selecionar Categoria -',
-  'Analgésicos',
-  'Anti-inflamatórios',
-  'Antibióticos',
-  'Antivirais',
-  'Diabetes',
-  'Hipertensão',
-  'Suplementos',
-  'Vitaminas',
-  'Outros'
+  "- Selecionar Categoria -",
+  "Ansioliticos",
+  "Anti-Depressivos",
+  "Analgésicos",
+  "Anti-inflamatórios",
+  "Antibióticos",
+  "Antivirais",
+  "Diabetes",
+  "Hipertensão",
+  "Suplementos",
+  "Vitaminas",
+  "Outros",
 ];
 
 const categoryOptions = [
-  'Analgésicos',
-  'Anti-inflamatórios',
-  'Antibióticos',
-  'Antivirais',
-  'Diabetes',
-  'Hipertensão',
-  'Suplementos',
-  'Vitaminas',
-  'Outros'
+  { label: "Ansioliticos", value: "ansioliticos" },
+  { label: "Anti-Depressivos", value: "anti-depressivos" },
+  { label: "Analgésicos", value: "analgesicos" },
+  { label: "Anti-inflamatórios", value: "anti-inflamatorios" },
+  { label: "Antibióticos", value: "antibioticos" },
+  { label: "Antivirais", value: "antivirais" },
+  { label: "Diabetes", value: "diabetes" },
+  { label: "Hipertensão", value: "hipertensao" },
+  { label: "Suplementos", value: "suplementos" },
+  { label: "Vitaminas", value: "vitaminas" },
+  { label: "Outros", value: "outros" },
 ];
 
 const frequencyOptions = [
-  'Uma vez ao dia',
-  'Duas vezes ao dia',
-  'Três vezes ao dia',
-  'Quatro vezes ao dia',
-  'A cada 8 horas',
-  'A cada 12 horas',
-  'Quando necessário',
-  'Antes das refeições',
-  'Após as refeições'
+  { label: "Uma vez ao dia", value: "1 vez ao dia", times: 1 },
+  { label: "Duas vezes ao dia", value: "2 vezes ao dia", times: 2 },
+  { label: "Três vezes ao dia", value: "3 vezes ao dia", times: 3 },
+  { label: "Quatro vezes ao dia", value: "4 vezes ao dia", times: 4 },
+  { label: "A cada 8 horas", value: "a cada 8 horas", times: 3 },
+  { label: "A cada 12 horas", value: "a cada 12 horas", times: 2 },
+  { label: "Quando necessário", value: "quando necessario", times: 1 },
+  { label: "Antes das refeições", value: "antes das refeições", times: 3 },
+  { label: "Após as refeições", value: "apos as refeições", times: 3 },
 ];
 
-// Lista de medicamentos
-const medicines = ref<Medicine[]>([
-  { 
-    id: 1,
-    name: 'Omeprazol', 
-    dosage: '20mg', 
-    category: 'Outros', 
-    frequency: 'Uma vez ao dia',
-    schedules: ['08:00'],
-    stock: 30,
-    duration: 30,
-    notes: 'Tomar em jejum',
-    icon: 'medication_liquid'
-  },
-  { 
-    id: 2,
-    name: 'Paracetamol', 
-    dosage: '750mg', 
-    category: 'Analgésicos', 
-    frequency: 'Quando necessário',
-    schedules: [],
-    stock: 15,
-    duration: null,
-    notes: 'Em caso de dor ou febre',
-    icon: 'medication'
-  },
-  { 
-    id: 3,
-    name: 'Losartana', 
-    dosage: '50mg', 
-    category: 'Hipertensão', 
-    frequency: 'Duas vezes ao dia',
-    schedules: ['08:00', '20:00'],
-    stock: 45,
-    duration: null,
-    notes: 'Controle de pressão arterial',
-    icon: 'medication'
-  },
-  { 
-    id: 4,
-    name: 'Insulina', 
-    dosage: '10 UI', 
-    category: 'Diabetes', 
-    frequency: 'Três vezes ao dia',
-    schedules: ['07:00', '13:00', '19:00'],
-    stock: 5,
-    duration: null,
-    notes: 'Aplicar antes das refeições',
-    icon: 'vaccines'
-  },
-  { 
-    id: 5,
-    name: 'Amoxicilina', 
-    dosage: '500mg', 
-    category: 'Antibióticos', 
-    frequency: 'A cada 8 horas',
-    schedules: ['06:00', '14:00', '22:00'],
-    stock: 3,
-    duration: 7,
-    notes: 'Tomar até o fim do tratamento',
-    icon: 'medication'
-  }
-]);
+// List of medicines
+const medicines = ref<Medicine[]>([]);
 
-// Colunas da tabela - corrigindo o tipo de align
+// Columns for the table
 const columns = [
-  { name: 'name', align: 'left' as const, label: 'Medicamento', field: 'name', sortable: true },
-  { name: 'dosage', align: 'left' as const, label: 'Dosagem', field: 'dosage', sortable: true },
-  { name: 'category', align: 'left' as const, label: 'Categoria', field: 'category', sortable: true },
-  { name: 'frequency', align: 'left' as const, label: 'Frequência', field: 'frequency', sortable: true },
-  { name: 'schedules', align: 'left' as const, label: 'Horários', field: 'schedules', sortable: false },
-  { name: 'stock', align: 'center' as const, label: 'Estoque', field: 'stock', sortable: true },
-  { name: 'action', align: 'center' as const, label: 'Ações', field: 'action', sortable: false }
+  {
+    name: "name",
+    align: "left" as const,
+    label: "Medicamento",
+    field: "name",
+    sortable: true,
+  },
+  {
+    name: "dosage",
+    align: "left" as const,
+    label: "Dosagem",
+    field: "dosage",
+    sortable: true,
+  },
+  {
+    name: "category",
+    align: "left" as const,
+    label: "Categoria",
+    field: "category",
+    sortable: true,
+  },
+  {
+    name: "frequency",
+    align: "left" as const,
+    label: "Frequência",
+    field: "frequency",
+    sortable: true,
+  },
+  {
+    name: "schedules",
+    align: "left" as const,
+    label: "Horários",
+    field: "schedules",
+    sortable: false,
+  },
+  {
+    name: "stock",
+    align: "center" as const,
+    label: "Estoque",
+    field: "stock",
+    sortable: true,
+  },
+  {
+    name: "status",
+    align: "center" as const,
+    label: "Status",
+    field: "status",
+    sortable: true,
+  },
+  {
+    name: "actions",
+    align: "center" as const,
+    label: "Ações",
+    field: "actions",
+    sortable: false,
+  },
 ];
 
 const pagination = ref({
-  rowsPerPage: 10
+  rowsPerPage: 10,
 });
 
-// Novo medicamento com tipos corretos
-const newMedicine = reactive<Medicine>({
+// New medicine reactive object
+const newMedicine = reactive<MedicineForm>({
   id: 0,
-  name: '',
-  dosage: '',
-  category: '',
-  frequency: '',
+  name: "",
+  dosage: "",
+  category: "",
+  frequency: "",
   schedules: [],
   stock: 0,
-  duration: null,
-  notes: '',
-  icon: 'medication'
 });
 
-// Funções
+// Functions to handle adding, editing, and deleting medicines
 const openAddDialog = () => {
   isEditing.value = false;
   resetForm();
@@ -442,9 +404,6 @@ const openAddDialog = () => {
 };
 
 const editMedicine = (medicine: Medicine) => {
-  isEditing.value = true;
-  
-  // Copiar valores do medicamento para o formulário
   newMedicine.id = medicine.id;
   newMedicine.name = medicine.name;
   newMedicine.dosage = medicine.dosage;
@@ -452,10 +411,7 @@ const editMedicine = (medicine: Medicine) => {
   newMedicine.frequency = medicine.frequency;
   newMedicine.schedules = [...medicine.schedules];
   newMedicine.stock = medicine.stock;
-  newMedicine.duration = medicine.duration;
-  newMedicine.notes = medicine.notes;
-  newMedicine.icon = medicine.icon;
-  
+  isEditing.value = true;
   medicineDialog.value = true;
 };
 
@@ -464,68 +420,136 @@ const confirmDelete = (medicine: Medicine) => {
   deleteDialog.value = true;
 };
 
-const deleteMedicine = () => {
-  if (medicineToDelete.value) {
-    const index = medicines.value.findIndex(m => m.id === medicineToDelete.value!.id);
-    if (index !== -1) {
-      medicines.value.splice(index, 1);
-    }
+const deleteMedicine = async () => {
+  if (!medicineToDelete.value) return;
+
+  try {
+    await api.delete(`/medication/${medicineToDelete.value.id}`);
+    success("Medicamento excluído com sucesso!");
+    await fetchMedicines();
+    medicineToDelete.value = null;
+  } catch (err) {
+    const axiosError = err as AxiosError;
+    console.error(
+      "Erro ao excluir medicamento:",
+      axiosError.response?.data || axiosError.message
+    );
+    error("Erro ao excluir medicamento");
   }
 };
 
 const resetForm = () => {
-  // Resetar valores do formulário
   newMedicine.id = 0;
-  newMedicine.name = '';
-  newMedicine.dosage = '';
-  newMedicine.category = '';
-  newMedicine.frequency = '';
+  newMedicine.name = "";
+  newMedicine.dosage = "";
+  newMedicine.category = "";
+  newMedicine.frequency = "";
   newMedicine.schedules = [];
   newMedicine.stock = 0;
-  newMedicine.duration = null;
-  newMedicine.notes = '';
-  newMedicine.icon = 'medication';
+  isEditing.value = false;
 };
 
-const addSchedule = () => {
-  if (currentTime.value && !newMedicine.schedules.includes(currentTime.value)) {
-    newMedicine.schedules.push(currentTime.value);
-    // Ordenar os horários
-    newMedicine.schedules.sort();
+const fetchMedicines = async () => {
+  try {
+    loading.value = true;
+    const response = await api.get("/medication/", {
+      params: {
+        search: search.value || undefined,
+        category: selectedGroup.value || undefined,
+      },
+    });
+    medicines.value = response.data;
+  } catch (err) {
+    const axiosError = err as AxiosError;
+    console.error(
+      "Erro ao buscar medicamentos:",
+      axiosError.response?.data || axiosError.message
+    );
+    error("Erro ao carregar medicamentos");
+  } finally {
+    loading.value = false;
   }
 };
 
-const removeSchedule = (index: number) => {
-  newMedicine.schedules.splice(index, 1);
-};
-
-const saveMedicine = () => {
-  // Gerar um ID para novo medicamento
-  if (newMedicine.id === 0) {
-    newMedicine.id = Date.now();
+const saveMedicine = async () => {
+  if (
+    !newMedicine.name ||
+    !newMedicine.dosage ||
+    !newMedicine.category ||
+    !newMedicine.frequency
+  ) {
+    error("Por favor, preencha todos os campos obrigatórios.");
+    return;
   }
-  
-  if (isEditing.value) {
-    // Atualizar medicamento existente
-    const index = medicines.value.findIndex(m => m.id === newMedicine.id);
-    if (index !== -1) {
-      medicines.value[index] = { ...newMedicine };
+  if (newMedicine.schedules.length === 0) {
+    error("Por favor, adicione pelo menos um horário de medicação.");
+    return;
+  }
+
+  if (newMedicine.stock < 0) {
+    error("A quantidade em estoque não pode ser negativa.");
+    return;
+  }
+
+  try {
+    if (isEditing.value) {
+      await api.put(`/medication/${newMedicine.id}`, newMedicine);
+      success("Medicamento atualizado com sucesso!");
+    } else {
+      await api.post("/medication/", newMedicine);
+      success("Medicamento adicionado com sucesso!");
     }
-  } else {
-    // Adicionar novo medicamento
-    medicines.value.push({ ...newMedicine });
+
+    // Update the list of medicines
+    await fetchMedicines();
+
+    // close dialog and reset form
+    medicineDialog.value = false;
+    resetForm();
+  } catch (err) {
+    const axiosError = err as AxiosError;
+    console.error(
+      "Erro ao salvar medicamento:",
+      axiosError.response?.data || axiosError.message
+    );
+    error("Erro ao salvar medicamento");
   }
-  
-  // Fechar o diálogo e resetar o formulário
-  medicineDialog.value = false;
-  resetForm();
 };
 
-const getStockColor = (stock: number): string => {
-  if (stock <= 3) return 'negative';
-  if (stock <= 10) return 'orange';
-  return 'positive';
+const getStatusColor = (medicine: Medicine): string => {
+  if (medicine.stock <= 3) return "negative";
+  if (medicine.stock <= 10) return "orange";
+  return "positive";
 };
+
+// Watching for changes in search and selectedGroup to refetch medicines
+watch([search, selectedGroup], async () => {
+  await fetchMedicines();
+});
+
+const updateSchedulesBasedOnFrequency = () => {
+  const selectedFrequency = frequencyOptions.find(
+    (opt) => opt.value === newMedicine.frequency
+  );
+  if (selectedFrequency) {
+    const currentSchedules = [...newMedicine.schedules];
+    newMedicine.schedules = Array(selectedFrequency.times)
+      .fill("")
+      .map((_, index) => currentSchedules[index] || "");
+  }
+};
+
+watch(
+  () => newMedicine.frequency,
+  () => {
+    updateSchedulesBasedOnFrequency();
+  }
+);
+
+// Carryng out the initial fetch of medicines
+onMounted(async () => {
+  await fetchMedicines();
+});
 </script>
 
 <style scoped>
@@ -541,7 +565,7 @@ const getStockColor = (stock: number): string => {
   color: var(--green);
 }
 
-/* Estilo para a tabela */
+/* Style for the table */
 :deep(.q-table th) {
   font-weight: bold;
   background-color: #f5f5f5;
@@ -555,13 +579,13 @@ const getStockColor = (stock: number): string => {
   color: var(--blue);
 }
 
-/* Estilo para o botão principal */
+/* Style for the negative button */
 .q-btn[color="negative"] {
   background-color: var(--orange-smooth);
   color: white;
 }
 
-/* Estilo para badges de estoque */
+/* style for badge */
 :deep(.q-badge) {
   font-size: 0.8rem;
   padding: 4px 8px;
