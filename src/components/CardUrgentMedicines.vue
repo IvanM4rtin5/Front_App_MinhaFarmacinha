@@ -1,0 +1,70 @@
+<template>
+  <q-card bordered class="card-item">
+    <q-card-section>
+      <div class="text-h6 text-negative">⚠️ Reposição Urgente</div>
+      <div class="text-h4 text-weight-bold q-mt-sm">
+        {{ urgentMedicinesCount }}
+      </div>
+      <q-btn
+        flat
+        label="Resolver agora"
+        color="negative"
+        class="q-mt-md"
+        @click="navigateToMedicines"
+      />
+    </q-card-section>
+  </q-card>
+</template>
+
+<script setup lang="ts">
+import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
+import { api } from "src/boot/axios";
+import { useNotify } from "src/composables/useNotify";
+
+interface Medicine {
+  id: number;
+  name: string;
+  dosage: string;
+  category: string;
+  frequency: string;
+  schedules: string[];
+  stock: number;
+  status: string;
+}
+
+const router = useRouter();
+const { error } = useNotify();
+const urgentMedicinesCount = ref(0);
+
+const fetchMedicinesData = async () => {
+  try {
+    const response = await api.get<Medicine[]>("/medication/");
+    const medicines = response.data;
+    urgentMedicinesCount.value = medicines.filter(
+      (med: Medicine) => med.stock <= 3
+    ).length;
+  } catch (err) {
+    console.error("Erro ao buscar dados dos medicamentos:", err);
+    error("Erro ao carregar dados dos medicamentos");
+  }
+};
+
+const navigateToMedicines = () => {
+  void router.push("/app/medicines");
+};
+
+onMounted(() => {
+  void fetchMedicinesData();
+});
+</script>
+
+<style scoped>
+.card-item {
+  padding: 12px;
+}
+
+.text-h6 {
+  font-weight: 600;
+}
+</style>
