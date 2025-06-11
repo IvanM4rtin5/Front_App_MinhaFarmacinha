@@ -40,13 +40,7 @@
       </div>
 
       <div class="card-grid q-mb-xl">
-        <q-card bordered class="card-item">
-          <q-card-section>
-            <div class="text-h6 text-primary">💊 Meus Medicamentos</div>
-            <div class="text-h4 text-weight-bold q-mt-sm">12</div>
-            <q-btn flat label="Ver todos" color="primary" class="q-mt-md" />
-          </q-card-section>
-        </q-card>
+        <CardActiveMedicines />
 
         <q-card bordered class="card-item">
           <q-card-section>
@@ -149,6 +143,7 @@
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
+import CardActiveMedicines from "src/components/CardActiveMedicines.vue";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);

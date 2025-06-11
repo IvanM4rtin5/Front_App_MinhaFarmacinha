@@ -6,7 +6,7 @@
           Minha Farmacinha <q-icon name="chevron_right" /> Meus Medicamentos
         </h5>
         <p class="text-grey-7">
-          Lista de medicamentos que estou utilizando atualmente.
+          Lista de medicamentos que voçe está utilizando atualmente.
         </p>
       </div>
       <div class="col-auto">
