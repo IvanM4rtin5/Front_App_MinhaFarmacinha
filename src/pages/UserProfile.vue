@@ -143,7 +143,7 @@
 import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
-import CardActiveMedicines from "src/components/CardActiveMedicines.vue";
+import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);

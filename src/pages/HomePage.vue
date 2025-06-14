@@ -23,7 +23,7 @@
 <script setup lang="ts">
 import { ref } from "vue";
 import { useRouter } from "vue-router";
-import CardMedicines from "components/CardMedicines.vue";
+import CardMedicines from "components/Cards/CardMedicines.vue";
 
 const router = useRouter();
 const name = ref(localStorage.getItem("name") || "Visitante");
