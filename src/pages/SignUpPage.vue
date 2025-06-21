@@ -81,7 +81,6 @@
               label="Cadastrar"
               type="submit"
               color="primary"
-              @click="handleSignUp"
               class="action-button"
             />
             <q-btn
@@ -105,6 +104,7 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import { api } from "src/boot/axios";
 import { useRouter } from "vue-router";
 import { useNotify } from "src/composables/useNotify";
 
@@ -113,39 +113,66 @@ const date = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const loading = ref(false);
 const router = useRouter();
 const { success, error } = useNotify();
 
 const handleSignUp = async () => {
+  if (loading.value) return;
+  loading.value = true;
+
   if (password.value !== confirmPassword.value) {
     error("As senhas não coincidem!");
+    loading.value = false
     return;
   }
 
   if (!name.value || !date.value || !email.value || !password.value) {
     error("Por favor, preencha todos os campos!");
+    loading.value= false;
     return;
   }
 
-  // Validação do email
+  // Email validation
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
   if (!emailRegex.test(email.value)) {
     error("Por favor, insira um email válido!");
     return;
   }
 
-  // Validação do formato da data YYYY-MM-DD
+  //  YYYY-MM-DD date format validation
   const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
   if (!dateRegex.test(date.value)) {
     error("Data de nascimento inválida!");
     return;
   }
 
+  const user = {
+    username: name.value,
+    email: email.value,
+    password: password.value,
+    birth_date: date.value,
+  };
+
   try {
+    await api.post("/auth/register", user);
     success("Usuário cadastrado com sucesso!");
     await router.push("/");
-  } catch {
-    error("Erro ao realizar cadastro. Tente novamente.");
+  } catch (e: unknown) {
+    const err = e as {
+      response?: { data?: { detail?: string; message?: string } };
+    };
+    if (err.response && err.response.data) {
+      error(
+        err.response.data.detail ||
+          err.response.data.message ||
+          "Erro ao realizar cadastro. Tente novamente."
+      );
+    } else {
+      error("Erro ao realizar cadastro. Tente novamente.");
+    }
+  }finally{
+    loading.value= false;
   }
 };
 
