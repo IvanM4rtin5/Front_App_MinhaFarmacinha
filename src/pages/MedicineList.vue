@@ -278,18 +278,17 @@ const { success, error } = useNotify();
 
 // Options for the selects
 const groupOptions = [
-  "- Selecionar Categoria -",
-  "Ansioliticos",
-  "Anti-Depressivos",
-  "Analgésicos",
-  "Anti-inflamatórios",
-  "Antibióticos",
-  "Antivirais",
-  "Diabetes",
-  "Hipertensão",
-  "Suplementos",
-  "Vitaminas",
-  "Outros",
+  { label: "Ansiolíticos", value: "ansioliticos" },
+  { label: "Anti-Depressivos", value: "anti-depressivos" },
+  { label: "Analgésicos", value: "analgesicos" },
+  { label: "Anti-inflamatórios", value: "anti-inflamatorios" },
+  { label: "Antibióticos", value: "antibioticos" },
+  { label: "Antivirais", value: "antivirais" },
+  { label: "Diabetes", value: "diabetes" },
+  { label: "Hipertensão", value: "hipertensao" },
+  { label: "Suplementos", value: "suplementos" },
+  { label: "Vitaminas", value: "vitaminas" },
+  { label: "Outros", value: "outros" },
 ];
 
 const categoryOptions = [

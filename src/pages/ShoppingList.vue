@@ -50,6 +50,7 @@
                 :class="{
                   'text-strike': props.row.checked,
                   'text-grey-6': props.row.checked,
+                  'item-large': true,
                 }"
                 >{{ props.row.name }}</span
               >
@@ -81,11 +82,19 @@
         </template>
         <template v-slot:header="props">
           <q-tr :props="props">
-            <q-th v-if="shoppingList.length > 0" key="checked" :props="props">
+            <q-th
+              v-if="shoppingList.length > 0"
+              key="checked"
+              :props="props"
+              class="header-large text-primary"
+            >
               Check
             </q-th>
-            <q-th key="name" :props="props">Produtos</q-th>
-            <q-th key="actions" :props="props">
+            <q-th key="name" :props="props" class="header-large text-primary">
+              Produtos
+              <q-icon name="shopping_cart" color="primary"/>
+            </q-th>
+            <q-th key="actions" :props="props" class="header-large text-primary">
               <transition name="fade">
                 <span v-if="shoppingList.some((item) => item.checked)"
                   >Ações</span
@@ -178,5 +187,12 @@ function addToMedicines(item: ShoppingItem) {
 .fade-enter-from,
 .fade-leave-to {
   opacity: 0;
+}
+.header-large {
+  font-size: 18px;
+  font-weight: 550;
+}
+.item-large {
+  font-size: 18px;
 }
 </style>
