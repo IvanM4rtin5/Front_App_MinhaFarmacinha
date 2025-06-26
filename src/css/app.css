@@ -71,3 +71,13 @@ button {
 .q-tooltip-arrow {
   display: none;
 }
+.my-notify {
+  width: 25vw; 
+  height: 15vh; 
+  opacity: 0.8; 
+  background-color: rgba(255, 255, 255, 0.8); 
+  border-radius: 10px; 
+  border: 2px solid var(--gray-dark);
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+
+}

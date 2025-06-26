@@ -6,6 +6,7 @@ export function useNotify() {
       type: 'positive',
       message,
       position: 'top-right',
+      classes: 'my-notify',
       color: 'positive',
       textColor: 'white',
       icon: 'done',
@@ -18,6 +19,7 @@ export function useNotify() {
       type: 'negative',
       message,
       position: 'top-right',
+      classes: 'my-notify',
       color: 'negative',
       textColor: 'white',
       icon: 'warning',
@@ -30,6 +32,7 @@ export function useNotify() {
       type: 'warning',
       message,
       position: 'top-right',
+      classes: 'my-notify',
       color: 'warning',
       textColor: 'white',
       icon: 'warning',
@@ -42,6 +45,7 @@ export function useNotify() {
       type: 'info',
       message,
       position: 'top-right',
+      classes: 'my-notify',
       color: 'info',
       textColor: 'white',
       icon: 'info',
@@ -51,3 +55,4 @@ export function useNotify() {
 
   return { success, error, warning, info }
 }
+
