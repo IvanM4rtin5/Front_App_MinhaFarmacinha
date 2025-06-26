@@ -24,7 +24,7 @@ const router = useRouter();
 const shoppingListCount = ref(0);
 
 const navigateToShoppingList = () => {
-  void router.push("/app/shopping-list");
+  void router.push("/app/shopping");
 };
 
 defineProps({
