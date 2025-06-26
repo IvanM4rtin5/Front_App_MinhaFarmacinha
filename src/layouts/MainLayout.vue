@@ -29,7 +29,7 @@
     <!-- Menu lateral -->
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list padding class="text-white">
-        <!-- Usuário (avatar + nome + menu) -->
+        <!-- User (avatar + name + menu) -->
         <div class="q-mt-xl q-mb-md flex flex-center column">
           <q-avatar size="56px" color="primary" text-color="white">
             <img v-if="avatarUrl" :src="avatarUrl" />
@@ -44,9 +44,9 @@
 
           <q-btn dense flat color="primary" label="Opções" class="q-mt-sm">
             <q-menu transition-show="rotate" transition-hide="rotate">
-              <q-list style="min-width: 90px; color: var(--gray-dark)">
+              <q-list style="min-width: 90px;" class="text-primary">
                 <q-item clickable>
-                  <q-item-section>Configurações</q-item-section>
+                  <q-item-section >Configurações</q-item-section>
                 </q-item>
                 <q-item clickable>
                   <q-item-section>Editar perfil</q-item-section>

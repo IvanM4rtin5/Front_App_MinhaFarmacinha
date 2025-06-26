@@ -13,9 +13,11 @@
         <q-btn
           color="negative"
           icon="add"
-          label="Adicionar Medicamento"
+          :label="!isMobile ? 'Adicionar Medicamento' : ''"
           @click="openAddDialog"
           class="q-px-md"
+          :round="isMobile"
+          :dense="isMobile"
         />
       </div>
     </div>
@@ -104,21 +106,6 @@
         </template>
       </q-table>
     </q-card>
-
-    <!-- Button of add medicine -->
-    <q-page-sticky position="bottom-right" :offset="[18, 18]">
-      <q-btn
-        fab
-        icon="add"
-        color="primary"
-        @click="
-          () => {
-            resetForm();
-            medicineDialog = true;
-          }
-        "
-      />
-    </q-page-sticky>
 
     <!-- Diálog of medicine -->
     <q-dialog v-model="medicineDialog" persistent>
@@ -241,7 +228,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted } from "vue";
+import { ref, reactive, watch, onMounted, onUnmounted } from "vue";
 import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
@@ -549,6 +536,13 @@ watch(
 onMounted(async () => {
   await fetchMedicines();
 });
+
+const isMobile = ref(window.innerWidth <= 700);
+const handleResize = () => {
+  isMobile.value = window.innerWidth <= 700;
+};
+onMounted(() => window.addEventListener("resize", handleResize));
+onUnmounted(() => window.removeEventListener("resize", handleResize));
 </script>
 
 <style scoped>
@@ -602,5 +596,14 @@ onMounted(async () => {
 :deep(.q-badge[color="positive"]) {
   background-color: var(--green-light);
   color: var(--green-dark);
+}
+
+@media (max-width: 700px) {
+  .q-btn.q-px-md {
+    padding-left: 8px !important;
+    padding-right: 8px !important;
+    font-size: 14px !important;
+    min-width: 36px !important;
+  }
 }
 </style>
