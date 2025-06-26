@@ -13,7 +13,7 @@
       <div class="col-8">
         <q-input
           v-model="newProduct"
-          label="Novo produto/medicamento"
+          label="Novo Produto/Medicamento"
           outlined
           dense
           @keyup.enter="addProduct"
@@ -43,7 +43,7 @@
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td v-if="shoppingList.length > 0" key="checked" :props="props">
-              <q-checkbox v-model="props.row.checked" color="positive" />
+              <q-checkbox v-model="props.row.checked" @update:model-value="()=> toggleChecked(props.row)" color="positive" />
             </q-td>
             <q-td key="name" :props="props">
               <span
@@ -117,6 +117,8 @@
 
 <script setup lang="ts">
 import { ref } from "vue";
+import {api} from "src/boot/axios"
+import { onMounted } from "vue";
 import { useNotify } from "../composables/useNotify";
 
 interface ShoppingItem {
@@ -125,10 +127,9 @@ interface ShoppingItem {
   checked: boolean;
 }
 
-const { success } = useNotify();
+const { success,info, error} = useNotify();
 const newProduct = ref("");
 const shoppingList = ref<ShoppingItem[]>([]);
-let nextId = 1;
 const loadingDeleteId = ref<number | null>(null);
 const loadingAdd = ref(false);
 
@@ -148,32 +149,71 @@ const columns = [
   { name: "actions", label: "", field: "actions", align: "center" as const },
 ];
 
-function addProduct() {
+async function addProduct() {
   const name = newProduct.value.trim();
-  if (!name) return;
+  if (!name) {
+    info('Insira um nome por favor');
+    return;
+  }
   loadingAdd.value = true;
-  setTimeout(() => {
-    shoppingList.value.push({ id: nextId++, name, checked: false });
+  try {
+    const response = await api.post('/shopping/', { name });
+    shoppingList.value.push({
+      id: response.data.id,
+      name: response.data.name,
+      checked: response.data.checked,
+    });
     newProduct.value = "";
+    success('Produto adicionado com sucesso!');
+  } catch {
+    error('Erro ao adicionar produto');
+  } finally {
     loadingAdd.value = false;
-  }, 500); // Simula loading
+  }
 }
 
-function removeProduct(id: number) {
+async function removeProduct(id: number) {
   loadingDeleteId.value = id;
   const item = shoppingList.value.find((item) => item.id === id);
-  setTimeout(() => {
+  try {
+    await api.delete(`/shopping/${id}`);
     const idx = shoppingList.value.findIndex((item) => item.id === id);
     if (idx !== -1) shoppingList.value.splice(idx, 1);
-    loadingDeleteId.value = null;
     if (item) success(`Produto "${item.name}" removido com sucesso`);
-  }, 700);
+  } catch {
+    error('Erro ao remover produto');
+  } finally {
+    loadingDeleteId.value = null;
+  }
+}
+
+async function toggleChecked(item: ShoppingItem) {
+  try {
+    const response = await api.patch(`/shopping/${item.id}`, { checked: !item.checked });
+    item.checked = response.data.checked;
+  } catch {
+    error('Erro ao atualizar item');
+  }
 }
 
 function addToMedicines(item: ShoppingItem) {
   // in development
   success(`Produto "${item.name}" adicionado à lista de medicamentos!`);
 }
+
+async function fetchShoppingList() {
+  try {
+    const response = await api.get('/shopping/');
+    shoppingList.value = response.data.map((item: ShoppingItem) => ({
+      id: item.id,
+      name: item.name,
+      checked: item.checked,
+    }));
+  } catch {
+    error('Erro ao buscar lista de compras');
+  }
+}
+onMounted(fetchShoppingList);
 </script>
 
 <style scoped>
