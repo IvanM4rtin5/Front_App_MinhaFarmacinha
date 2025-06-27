@@ -17,21 +17,36 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref,onMounted } from "vue";
 import { useRouter } from "vue-router";
+import { api } from "src/boot/axios";
+import { useNotify } from "src/composables/useNotify";
+
+interface Products {
+  id:number
+  name:string
+}
 
 const router = useRouter();
 const shoppingListCount = ref(0);
+const {error} = useNotify();
+
+const fetchShoppingList = async () => {
+  try{
+    const response = await api.get<Products[]>("/shopping/");
+    const products = response.data;
+    shoppingListCount .value = products. length;
+  }catch{
+    error("Erro ao carregar dados da Lista de Produtos")
+  }
+};
 
 const navigateToShoppingList = () => {
   void router.push("/app/shopping");
 };
 
-defineProps({
-  count: {
-    type: Number,
-    default: 0,
-  },
+onMounted(() => {
+  void fetchShoppingList();
 });
 </script>
 

@@ -232,6 +232,7 @@ import { ref, reactive, watch, onMounted, onUnmounted } from "vue";
 import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
+import { useRoute } from "vue-router";
 
 interface Medicine {
   id: number;
@@ -262,6 +263,7 @@ const medicineToDelete = ref<Medicine | null>(null);
 const medicineDialog = ref(false);
 const deleteDialog = ref(false);
 const { success, error } = useNotify();
+const route = useRoute();
 
 // Options for the selects
 const groupOptions = [
@@ -492,6 +494,19 @@ const saveMedicine = async () => {
     // close dialog and reset form
     medicineDialog.value = false;
     resetForm();
+
+    if (
+      !isEditing.value &&
+      route.query.shoppingId &&
+      typeof route.query.shoppingId === "string"
+    ) {
+      try {
+        await api.delete(`/shopping/${route.query.shoppingId}`);
+        success("Medicamento adicionado e removido da lista de compras!");
+      } catch {
+        error("Não foi possível remover o medicamento da lista de compras.");
+      }
+    }
   } catch (err) {
     const axiosError = err as AxiosError;
     console.error(
@@ -535,6 +550,13 @@ watch(
 // Carryng out the initial fetch of medicines
 onMounted(async () => {
   await fetchMedicines();
+  // Automatically open modal if it comes from the shopping list
+  if (route.query.add === "1") {
+    openAddDialog();
+    if (route.query.name) {
+      newMedicine.name = route.query.name as string;
+    }
+  }
 });
 
 const isMobile = ref(window.innerWidth <= 700);

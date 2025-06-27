@@ -43,7 +43,13 @@
         <template v-slot:body="props">
           <q-tr :props="props">
             <q-td v-if="shoppingList.length > 0" key="checked" :props="props">
-              <q-checkbox v-model="props.row.checked" @update:model-value="()=> toggleChecked(props.row)" color="positive" />
+              <q-checkbox
+                :model-value="props.row.checked"
+                @update:model-value="
+                  (checked) => toggleChecked(props.row, checked)
+                "
+                color="positive"
+              />
             </q-td>
             <q-td key="name" :props="props">
               <span
@@ -92,9 +98,13 @@
             </q-th>
             <q-th key="name" :props="props" class="header-large text-primary">
               Produtos
-              <q-icon name="shopping_cart" color="primary"/>
+              <q-icon name="shopping_cart" color="primary" />
             </q-th>
-            <q-th key="actions" :props="props" class="header-large text-primary">
+            <q-th
+              key="actions"
+              :props="props"
+              class="header-large text-primary"
+            >
               <transition name="fade">
                 <span v-if="shoppingList.some((item) => item.checked)"
                   >Ações</span
@@ -112,13 +122,43 @@
         </template>
       </q-table>
     </q-card>
+
+    <q-dialog v-model="showAddMedicineModal" persistent>
+      <q-card>
+        <q-card-section class="row items-center q-ml-sm" >
+            <q-avatar icon="add"
+            class="q-mr-sm"
+            color="primary"
+            text-color="white"/>
+            <h6 class="q-ml-sm text-primary" >Adicionar como medicamento?</h6>
+            <p class="q-mt-md q-ml-lg">
+              Deseja adicionar
+              <strong>{{ selectedShoppingItem?.name }}</strong> como medicamento ?
+            </p>
+        </q-card-section>
+        <q-card-actions class="q-mr-md" align="right">
+          <q-btn flat 
+          label="Cancelar"
+          style="background-color: red;"
+          color="white" 
+          v-close-popup />
+          <q-btn
+            flat
+            label="Adicionar"
+            style="background-color: blue;"
+            color="white"
+            @click="confirmAddToMedicines"
+          />
+        </q-card-actions>
+      </q-card>
+    </q-dialog>
   </q-page>
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
-import {api} from "src/boot/axios"
-import { onMounted } from "vue";
+import { ref, onMounted } from "vue";
+import { api } from "src/boot/axios";
+import { useRouter } from "vue-router";
 import { useNotify } from "../composables/useNotify";
 
 interface ShoppingItem {
@@ -127,11 +167,15 @@ interface ShoppingItem {
   checked: boolean;
 }
 
-const { success,info, error} = useNotify();
+const { success, info, error } = useNotify();
 const newProduct = ref("");
 const shoppingList = ref<ShoppingItem[]>([]);
 const loadingDeleteId = ref<number | null>(null);
 const loadingAdd = ref(false);
+const router = useRouter();
+
+const showAddMedicineModal = ref(false);
+const selectedShoppingItem = ref<ShoppingItem | null>(null);
 
 const columns = [
   {
@@ -152,21 +196,21 @@ const columns = [
 async function addProduct() {
   const name = newProduct.value.trim();
   if (!name) {
-    info('Insira um nome por favor');
+    info("Insira um nome por favor");
     return;
   }
   loadingAdd.value = true;
   try {
-    const response = await api.post('/shopping/', { name });
+    const response = await api.post("/shopping/", { name });
     shoppingList.value.push({
       id: response.data.id,
       name: response.data.name,
       checked: response.data.checked,
     });
     newProduct.value = "";
-    success('Produto adicionado com sucesso!');
+    success("Produto adicionado com sucesso!");
   } catch {
-    error('Erro ao adicionar produto');
+    error("Erro ao adicionar produto");
   } finally {
     loadingAdd.value = false;
   }
@@ -181,36 +225,44 @@ async function removeProduct(id: number) {
     if (idx !== -1) shoppingList.value.splice(idx, 1);
     if (item) success(`Produto "${item.name}" removido com sucesso`);
   } catch {
-    error('Erro ao remover produto');
+    error("Erro ao remover produto");
   } finally {
     loadingDeleteId.value = null;
   }
 }
 
-async function toggleChecked(item: ShoppingItem) {
+async function toggleChecked(item: ShoppingItem, checked: boolean) {
   try {
-    const response = await api.patch(`/shopping/${item.id}`, { checked: !item.checked });
+    const response = await api.patch(`/shopping/${item.id}`, { checked });
     item.checked = response.data.checked;
   } catch {
-    error('Erro ao atualizar item');
+    error("Erro ao atualizar item");
   }
 }
 
 function addToMedicines(item: ShoppingItem) {
-  // in development
-  success(`Produto "${item.name}" adicionado à lista de medicamentos!`);
+  selectedShoppingItem.value = item;
+  showAddMedicineModal.value = true;
+}
+
+function confirmAddToMedicines() {
+  showAddMedicineModal.value = false;
+  void router.push({
+    path: "/app/medicines",
+    query: { add: "1", name: selectedShoppingItem.value?.name, shoppingId: selectedShoppingItem.value?.id }
+  });
 }
 
 async function fetchShoppingList() {
   try {
-    const response = await api.get('/shopping/');
+    const response = await api.get("/shopping/");
     shoppingList.value = response.data.map((item: ShoppingItem) => ({
       id: item.id,
       name: item.name,
       checked: item.checked,
     }));
   } catch {
-    error('Erro ao buscar lista de compras');
+    error("Erro ao buscar lista de compras");
   }
 }
 onMounted(fetchShoppingList);
@@ -235,4 +287,5 @@ onMounted(fetchShoppingList);
 .item-large {
   font-size: 18px;
 }
+
 </style>

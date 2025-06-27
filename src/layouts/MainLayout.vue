@@ -44,9 +44,9 @@
 
           <q-btn dense flat color="primary" label="Opções" class="q-mt-sm">
             <q-menu transition-show="rotate" transition-hide="rotate">
-              <q-list style="min-width: 90px;" class="text-primary">
+              <q-list style="min-width: 90px" class="text-primary">
                 <q-item clickable>
-                  <q-item-section >Configurações</q-item-section>
+                  <q-item-section>Configurações</q-item-section>
                 </q-item>
                 <q-item clickable>
                   <q-item-section>Editar perfil</q-item-section>
@@ -97,6 +97,24 @@
           <q-item-section>Perfil</q-item-section>
         </q-item>
       </q-list>
+      <footer class="footer-container">
+        <div class="footer-content">
+          <div class="footer-logo-section">
+            <img
+              class="footer-logo"
+              src="../assets/image/favicon-96x96.png"
+              alt="Minha Farmacinha"
+            />
+            <span class="footer-brand">Minha Farmacinha</span>
+          </div>
+          <div class="footer-info">
+            <p class="footer-text">
+              © 2024 Minha Farmacinha. Todos os direitos reservados.
+            </p>
+            <p class="footer-subtext">Sua saúde em primeiro lugar</p>
+          </div>
+        </div>
+      </footer>
     </q-drawer>
 
     <!-- Conteúdo da página -->
@@ -138,5 +156,63 @@ function handleUserClick() {
 .q-item,
 .q-item-label {
   font-size: 18px;
+}
+
+.footer-container {
+  margin-top: 10px;
+  padding: 24px 16px;
+  background: linear-gradient(135deg, var(--blue-light) 0%, var(--white) 100%);
+  border-top: 2px solid var(--blue);
+}
+
+.footer-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.footer-logo-section {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.footer-logo {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s ease;
+}
+
+.footer-logo:hover {
+  transform: scale(1.05);
+}
+
+.footer-brand {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--blue);
+}
+
+.footer-info {
+  text-align: center;
+}
+
+.footer-text {
+  color: var(--gray-dark);
+  font-size: 14px;
+  font-weight: 500;
+  margin: 0 0 4px 0;
+}
+
+.footer-subtext {
+  color: var(--gray-dark);
+  font-size: 12px;
+  opacity: 0.8;
+  margin: 0;
 }
 </style>
