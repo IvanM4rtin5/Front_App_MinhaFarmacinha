@@ -72,13 +72,13 @@
       <div class="login-container">
         <div class="login-left">
           <div
-            class="text-h5 text-primary q-mb-sm"
+            class="text-h5 text-primary q-mb-sm text-center"
             style="font-weight: bold; font-size: 27px"
           >
             SEJA BEM-VINDO
           </div>
           <div
-            class="text-subtitle2 q-mb-lg"
+            class="text-subtitle2 q-mb-lg text-center"
             style="color: var(--gray-dark); font-size: 15px"
           >
             Identifique-se Por favor para acessar a
