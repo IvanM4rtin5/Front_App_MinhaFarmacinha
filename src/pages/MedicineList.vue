@@ -119,6 +119,14 @@
         <q-card-section class="q-pt-lg">
           <q-form @submit="saveMedicine" class="q-gutter-md">
             <q-input
+              v-if="isEditing"
+              v-model="createdAtFormatted"
+              label="Data de inserção"
+              outlined
+              readonly
+              disable
+            />
+            <q-input
               v-model="newMedicine.name"
               label="Nome do medicamento"
               :rules="[(val) => !!val || 'Nome é obrigatório']"
@@ -127,8 +135,10 @@
 
             <q-input
               v-model="newMedicine.dosage"
-              label="Dosagem"
-              :rules="[(val) => !!val || 'Dosagem é obrigatória']"
+              type="number"
+              step="0.01"
+              label="Dosagem (Mg ou Unidade)"
+              :rules="[(val) => !!val || 'Informe a Dosagem']"
               outlined
             />
 
@@ -153,20 +163,37 @@
             />
 
             <q-input
-              v-model.number="newMedicine.stock"
+              v-model.number="newMedicine.boxes"
               type="number"
-              label="Quantidade em estoque"
+              label="Quantidade de caixas"
               :rules="[
-                (val) => val >= 0 || 'Quantidade não pode ser negativa',
-                (val) => !!val || 'Quantidade é obrigatória',
+                (val) => val > 0 || 'Deve ter pelo menos 1 caixa',
+                (val) => !!val || 'Campo obrigatório',
               ]"
               outlined
             />
-
+            <q-input
+              v-model.number="newMedicine.pills_per_box"
+              type="number"
+              label="Comprimidos por caixa"
+              :rules="[
+                (val) => val > 0 || 'A caixa deve ter pelo menos 1 comprimido',
+                (val) => !!val || 'Campo obrigatório',
+              ]"
+              outlined
+            />
+            <q-input
+              v-model.number="newMedicine.stock"
+              type="number"
+              label="Quantidade em estoque"
+              outlined
+              readonly
+              disable
+            />
             <div class="text-subtitle2 q-mb-sm">Horários de medicação</div>
             <div class="row q-col-gutter-sm">
               <div
-                v-for="(schedule, index) in newMedicine.schedules"
+                v-for="(_, index) in newMedicine.schedules"
                 :key="index"
                 class="col-12 col-sm-6"
               >
@@ -178,6 +205,13 @@
                   :label="`Horário ${index + 1}`"
                 />
               </div>
+              <q-input
+                v-model="newMedicine.days_until_empty"
+                label="Dias até acabar"
+                outlined
+                readonly
+                disable
+              />
             </div>
 
             <div class="row justify-end q-mt-md">
@@ -228,7 +262,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, watch, onMounted, onUnmounted } from "vue";
+import { ref, reactive, watch, onMounted, onUnmounted, computed } from "vue";
 import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
@@ -237,22 +271,30 @@ import { useRoute } from "vue-router";
 interface Medicine {
   id: number;
   name: string;
-  dosage: string;
+  dosage: number;
   category: string;
   frequency: string;
   schedules: string[];
   stock: number;
   status: string;
+  pills_per_box: number;
+  created_at: string;
+  days_until_empty?: number;
+  is_low_stock?: boolean;
 }
 
 interface MedicineForm {
   id: number;
   name: string;
-  dosage: string;
+  dosage: number;
   category: string;
   frequency: string;
   schedules: string[];
   stock: number;
+  pills_per_box: number;
+  boxes: number;
+  created_at?: string;
+  days_until_empty: number;
 }
 
 const loading = ref(false);
@@ -262,8 +304,14 @@ const isEditing = ref(false);
 const medicineToDelete = ref<Medicine | null>(null);
 const medicineDialog = ref(false);
 const deleteDialog = ref(false);
-const { success, error } = useNotify();
+const { success, error, info } = useNotify();
 const route = useRoute();
+
+const createdAtFormatted = computed(() =>
+  newMedicine.created_at
+    ? new Date(newMedicine.created_at).toLocaleString("pt-BR")
+    : ""
+);
 
 // Options for the selects
 const groupOptions = [
@@ -295,15 +343,15 @@ const categoryOptions = [
 ];
 
 const frequencyOptions = [
-  { label: "Uma vez ao dia", value: "1 vez ao dia", times: 1 },
-  { label: "Duas vezes ao dia", value: "2 vezes ao dia", times: 2 },
-  { label: "Três vezes ao dia", value: "3 vezes ao dia", times: 3 },
-  { label: "Quatro vezes ao dia", value: "4 vezes ao dia", times: 4 },
-  { label: "A cada 8 horas", value: "a cada 8 horas", times: 3 },
-  { label: "A cada 12 horas", value: "a cada 12 horas", times: 2 },
-  { label: "Quando necessário", value: "quando necessario", times: 1 },
-  { label: "Antes das refeições", value: "antes das refeições", times: 3 },
-  { label: "Após as refeições", value: "apos as refeições", times: 3 },
+  { label: "Uma vez ao dia", value: "1x ao dia", times: 1 },
+  { label: "Duas vezes ao dia", value: "2x ao dia", times: 2 },
+  { label: "Três vezes ao dia", value: "3x ao dia", times: 3 },
+  { label: "Quatro vezes ao dia", value: "4x ao dia", times: 4 },
+  { label: "A cada 8 horas", value: "3x ao dia", times: 3 },
+  { label: "A cada 12 horas", value: "2x ao dia", times: 2 },
+  { label: "Quando necessário", value: "1x ao dia", times: 1 },
+  { label: "Antes das refeições", value: "3x ao dia", times: 3 },
+  { label: "Após as refeições", value: "3x ao dia", times: 3 },
 ];
 
 // List of medicines
@@ -361,6 +409,21 @@ const columns = [
     sortable: true,
   },
   {
+    name: "pills_per_box",
+    align: "center" as const,
+    label: "Comprimidos/Caixa",
+    field: "pills_per_box",
+    sortable: true,
+  },
+  {
+    name: "created_at",
+    align: "center" as const,
+    label: "Data de inserção",
+    field: "created_at",
+    sortable: true,
+    format: (val: string) => new Date(val).toLocaleDateString("pt-BR"),
+  },
+  {
     name: "actions",
     align: "center" as const,
     label: "Ações",
@@ -377,14 +440,24 @@ const pagination = ref({
 const newMedicine = reactive<MedicineForm>({
   id: 0,
   name: "",
-  dosage: "",
+  dosage: 0,
   category: "",
   frequency: "",
   schedules: [],
   stock: 0,
+  boxes: 1,
+  pills_per_box: 1,
+  created_at: "",
+  days_until_empty: 0,
 });
 
-// Functions to handle adding, editing, and deleting medicines
+watch(
+  () => [newMedicine.boxes, newMedicine.pills_per_box],
+  () => {
+    newMedicine.stock = newMedicine.boxes * newMedicine.pills_per_box;
+  }
+);
+
 const openAddDialog = () => {
   isEditing.value = false;
   resetForm();
@@ -399,6 +472,9 @@ const editMedicine = (medicine: Medicine) => {
   newMedicine.frequency = medicine.frequency;
   newMedicine.schedules = [...medicine.schedules];
   newMedicine.stock = medicine.stock;
+  newMedicine.pills_per_box = medicine.pills_per_box;
+  newMedicine.created_at = medicine.created_at;
+  newMedicine.days_until_empty = medicine.days_until_empty ?? 0;
   isEditing.value = true;
   medicineDialog.value = true;
 };
@@ -429,11 +505,12 @@ const deleteMedicine = async () => {
 const resetForm = () => {
   newMedicine.id = 0;
   newMedicine.name = "";
-  newMedicine.dosage = "";
+  newMedicine.dosage = 0;
   newMedicine.category = "";
   newMedicine.frequency = "";
   newMedicine.schedules = [];
   newMedicine.stock = 0;
+  newMedicine.boxes = 1;
   isEditing.value = false;
 };
 
@@ -447,6 +524,7 @@ const fetchMedicines = async () => {
       },
     });
     medicines.value = response.data;
+    // console.log(response.data);
   } catch (err) {
     const axiosError = err as AxiosError;
     console.error(
@@ -488,10 +566,7 @@ const saveMedicine = async () => {
       success("Medicamento adicionado com sucesso!");
     }
 
-    // Update the list of medicines
     await fetchMedicines();
-
-    // close dialog and reset form
     medicineDialog.value = false;
     resetForm();
 
@@ -507,13 +582,39 @@ const saveMedicine = async () => {
         error("Não foi possível remover o medicamento da lista de compras.");
       }
     }
-  } catch (err) {
-    const axiosError = err as AxiosError;
-    console.error(
-      "Erro ao salvar medicamento:",
-      axiosError.response?.data || axiosError.message
-    );
+  } catch (err: unknown) {
+    console.log("Erro ao salvar medicamento (catch):", err);
+
+    const status =
+      typeof err === "object" && err !== null && "response" in err
+        ? (err as { response?: { status?: number } }).response?.status
+        : undefined;
+
+    if (status === 409) {
+
+      info(
+        "Já existe um medicamento com este nome e dosagem. Edite o medicamento existente."
+      );
+
+      await fetchMedicines();
+
+      const existing = medicines.value.find(
+        (m) =>
+          m.name.trim().toLowerCase() ===
+            newMedicine.name.trim().toLowerCase() &&
+          m.dosage === newMedicine.dosage
+      );
+      if (existing) {
+        // console.log(existing);
+        error(
+          "Não foi possível localizar o medicamento duplicado para edição."
+        );
+      }
+      return;
+    }
+
     error("Erro ao salvar medicamento");
+    console.error("Erro ao salvar medicamento:", err);
   }
 };
 
