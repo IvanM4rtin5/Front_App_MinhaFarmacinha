@@ -49,7 +49,6 @@
                 label="Entrar"
                 type="submit"
                 color="primary"
-                @click="handleLogin"
               />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
             </div>
@@ -165,9 +164,10 @@ onUnmounted(() => {
 });
 
 const handleLogin = async () => {
-  console.log(username.value, password.value);
+  // console.log(username.value, password.value);
   try {
     const user = await authStore.login(username.value, password.value);
+    // console.log("Resultado do login:", user);
     if (user) {
       loginError.value = false;
       success("Login realizado com sucesso!");

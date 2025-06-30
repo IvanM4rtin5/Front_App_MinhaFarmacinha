@@ -111,20 +111,6 @@ export default defineComponent({
     const loading = ref(false);
     let websocket: WebSocket | null = null;
 
-    // Função para obter o token de autenticação
-    const getAuthToken = () => {
-      return (
-        localStorage.getItem("access_token") ||
-        sessionStorage.getItem("access_token")
-      );
-    };
-
-    // Função para verificar se o usuário está autenticado
-    const isAuthenticated = () => {
-      const token = getAuthToken();
-      return !!token;
-    };
-
     const getNotificationIcon = (type: string): string => {
       const icons = {
         medication_reminder: "schedule",
@@ -166,12 +152,6 @@ export default defineComponent({
     };
 
     const loadNotifications = async () => {
-      // Verifica se está autenticado
-      if (!isAuthenticated()) {
-        console.log("Usuário não autenticado");
-        return;
-      }
-
       try {
         loading.value = true;
         const response = await api.get("/notification/", {
@@ -204,10 +184,6 @@ export default defineComponent({
     };
 
     const loadUnreadCount = async () => {
-      if (!isAuthenticated()) {
-        return;
-      }
-
       try {
         const response = await api.get("/notification/unread/count");
         unreadCount.value = response.data.unread_count;
@@ -227,10 +203,6 @@ export default defineComponent({
     };
 
     const markAsRead = async (notificationId: number) => {
-      if (!isAuthenticated()) {
-        return;
-      }
-
       try {
         await api.patch(`/notification/${notificationId}/read`);
 
@@ -260,10 +232,6 @@ export default defineComponent({
     };
 
     const markAllAsRead = async () => {
-      if (!isAuthenticated()) {
-        return;
-      }
-
       try {
         await api.post("/notification/mark-all-read");
 
@@ -308,14 +276,26 @@ export default defineComponent({
     };
 
     const connectWebSocket = () => {
-      const userId = localStorage.getItem("user_id");
-      if (!userId || !isAuthenticated()) return;
-
-      const wsUrl = "ws://localhost:8000";
-      websocket = new WebSocket(`${wsUrl}/notification/ws/${userId}`);
+      const userStr = localStorage.getItem("user");
+      let userId = null;
+      if (userStr) {
+        try {
+          const user = JSON.parse(userStr);
+          userId = user && user.id ? user.id : null;
+        } catch {
+          userId = null;
+        }
+      }
+      const token = localStorage.getItem("token");
+      if (!userId || !token) {
+        // console.warn("WebSocket não conectado: user_id ou token ausente");
+        return;
+      }
+      const wsUrl = `ws://localhost:8000/api/v1/notification/ws/${userId}?token=${token}`;
+      websocket = new WebSocket(wsUrl);
 
       websocket.onopen = () => {
-        console.log("WebSocket conectado para notificações");
+        // console.log("WebSocket conectado para notificações");
       };
 
       websocket.onmessage = (event) => {
@@ -343,19 +323,16 @@ export default defineComponent({
       };
 
       websocket.onclose = () => {
-        console.log("WebSocket desconectado");
+        // console.log("WebSocket desconectado");
         setTimeout(connectWebSocket, 5000);
       };
     };
 
     // Lifecycle
     onMounted(() => {
-      // Só carrega se estiver autenticado
-      if (isAuthenticated()) {
-        void loadNotifications();
-        void loadUnreadCount();
-        connectWebSocket();
-      }
+      void loadNotifications();
+      void loadUnreadCount();
+      connectWebSocket();
     });
 
     onUnmounted(() => {
@@ -379,7 +356,6 @@ export default defineComponent({
   },
 });
 </script>
-
 
 <style scoped>
 .q-badge {

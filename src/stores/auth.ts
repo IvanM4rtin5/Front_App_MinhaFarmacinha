@@ -29,7 +29,7 @@ export const useAuthStore = defineStore("auth", {
 
   actions: {
     async login(username: string, password: string): Promise<User | false> {
-      try {
+      try { 
         const response = await api.post("/auth/login", {
           username: username,
           password: password,
@@ -40,9 +40,16 @@ export const useAuthStore = defineStore("auth", {
           api.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
 
           try {
+            console.log("Token recebido:", response.data.access_token);
             const tokenPayload = JSON.parse(atob(response.data.access_token.split('.')[1]));
-            const userId = tokenPayload.sub; 
-            const userResponse = await api.get(`/users/${userId}`);
+            const userId = tokenPayload.sub;
+            console.log("ID extraído do token:", userId); 
+            const userResponse = await api.get(`/users/${userId}`, {
+              headers: {
+                Authorization: `Bearer ${response.data.access_token}`
+              }
+            });
+            console.log("Resposta do GET /users:", userResponse);
             const userData = userResponse.data;
 
             const user: User = {
