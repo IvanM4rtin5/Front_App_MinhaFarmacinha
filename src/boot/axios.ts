@@ -48,7 +48,7 @@ api.interceptors.response.use(
       localStorage.removeItem("name");
       window.location.href = "/";
     }
-    return Promise.reject(new Error(error.message || "Erro na requisição"));
+    return Promise.reject(error);
   }
 );
 
