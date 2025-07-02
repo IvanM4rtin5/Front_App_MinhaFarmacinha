@@ -21,7 +21,7 @@
         </q-toolbar-title>
 
         <div class="row items-center">
-          <NotificationsDropdown />
+          <NotificationsDropdown @abrirMensagem="openMessageModal" />
           <q-tooltip>Notificações</q-tooltip>
         </div>
       </q-toolbar>
@@ -117,8 +117,12 @@
       </footer>
     </q-drawer>
 
-    <!-- Conteúdo da página -->
+    <!-- page content -->
     <q-page-container>
+      <ModalNotify
+        v-model="showModalNotify"
+        :notification="selectedNotification"
+      />
       <router-view />
     </q-page-container>
   </q-layout>
@@ -129,12 +133,16 @@ import { ref } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
-import NotificationsDropdown from "components/NotificationsDropdown.vue";
+import NotificationsDropdown from "src/components/Notify/NotificationsDropdown.vue";
+import ModalNotify from "src/components/Notify/ModalNotify.vue";
+import type { Notification } from "src/types/notification";
 
 const router = useRouter();
 const leftDrawerOpen = ref(false);
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
+const showModalNotify = ref(false);
+const selectedNotification = ref<Notification | null>(null);
 
 function toggleLeftDrawer() {
   leftDrawerOpen.value = !leftDrawerOpen.value;
@@ -146,6 +154,11 @@ function handleUserClick() {
     console.log("Redirecionando para /");
     void router.push("/");
   }
+}
+
+function openMessageModal(notification: Notification | null) {
+  selectedNotification.value = notification;
+  showModalNotify.value = true;
 }
 </script>
 

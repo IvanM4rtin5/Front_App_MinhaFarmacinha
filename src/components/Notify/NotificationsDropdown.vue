@@ -37,8 +37,8 @@
           :key="notification.id"
           clickable
           v-ripple
-          @click="markAsRead(notification.id)"
-          :class="{ 'bg-grey-1': notification.status === 'read' }"
+          @click="markAsRead(notification.id); emitNotification(notification)"
+          :class="{ 'bg-grey-1': notification.status === 'READ' }"
         >
           <q-item-section avatar>
             <q-icon
@@ -60,7 +60,7 @@
               formatTime(notification.created_at)
             }}</q-item-label>
             <q-icon
-              v-if="notification.status !== 'read'"
+              v-if="notification.status !== 'READ'"
               name="fiber_manual_record"
               color="primary"
               size="xs"
@@ -90,21 +90,13 @@
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
 import { api } from "src/boot/axios";
-
-interface Notification {
-  id: number;
-  title: string;
-  message: string;
-  notification_type: string;
-  status: string;
-  created_at: string;
-  medication_name?: string;
-}
+import type { Notification } from "src/types/notification";
 
 export default defineComponent({
   name: "NotificationsDropdown",
+  emits: ["abrirMensagem"],
 
-  setup() {
+  setup(props, { emit }) {
     const $q = useQuasar();
     const notifications = ref<Notification[]>([]);
     const unreadCount = ref(0);
@@ -210,7 +202,7 @@ export default defineComponent({
           (n) => n.id === notificationId
         );
         if (notification) {
-          notification.status = "read";
+          notification.status = "READ";
         }
         updateUnreadCount();
       } catch (error: unknown) {
@@ -235,7 +227,7 @@ export default defineComponent({
       try {
         await api.post("/notification/mark-all-read");
 
-        notifications.value.forEach((n) => (n.status = "read"));
+        notifications.value.forEach((n) => (n.status = "READ"));
         updateUnreadCount();
         $q.notify({
           type: "positive",
@@ -271,7 +263,7 @@ export default defineComponent({
 
     const updateUnreadCount = () => {
       unreadCount.value = notifications.value.filter(
-        (n) => n.status !== "read"
+        (n) => n.status !== "READ"
       ).length;
     };
 
@@ -328,6 +320,10 @@ export default defineComponent({
       };
     };
 
+    function emitNotification(notification: Notification) {
+      emit("abrirMensagem", notification);
+    }
+
     // Lifecycle
     onMounted(() => {
       void loadNotifications();
@@ -352,6 +348,7 @@ export default defineComponent({
       markAsRead,
       markAllAsRead,
       refreshNotifications,
+      emitNotification,
     };
   },
 });
