@@ -37,7 +37,10 @@
           :key="notification.id"
           clickable
           v-ripple
-          @click="markAsRead(notification.id); emitNotification(notification)"
+          @click="
+            markAsRead(notification.id);
+            emitNotification(notification);
+          "
           :class="{ 'bg-grey-1': notification.status === 'READ' }"
         >
           <q-item-section avatar>
@@ -53,6 +56,9 @@
             <q-item-label caption v-if="notification.medication_name">
               Medicamento: {{ notification.medication_name }}
             </q-item-label>
+            <q-item-label caption v-if="notification.medication_dosage">
+              Dosagem: {{ notification.medication_dosage }}
+            </q-item-label>
           </q-item-section>
 
           <q-item-section side>
@@ -64,6 +70,15 @@
               name="fiber_manual_record"
               color="primary"
               size="xs"
+            />
+            <q-btn
+              flat
+              round
+              dense
+              icon="delete"
+              color="negative"
+              @click.stop="deleteNotification(notification.id)"
+              size="sm"
             />
           </q-item-section>
         </q-item>
@@ -89,8 +104,8 @@
 <script lang="ts">
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
-import { api } from "src/boot/axios";
-import type { Notification } from "src/types/notification";
+import { api } from "../../boot/axios";
+import type { Notification } from "../../types/notification";
 
 export default defineComponent({
   name: "NotificationsDropdown",
@@ -147,7 +162,7 @@ export default defineComponent({
       try {
         loading.value = true;
         const response = await api.get("/notification/", {
-          params: { limit: 10 },
+          params: { limit: 100 },
         });
 
         notifications.value = response.data;
@@ -324,6 +339,25 @@ export default defineComponent({
       emit("abrirMensagem", notification);
     }
 
+    const deleteNotification = async (notificationId: number) => {
+      try {
+        await api.delete(`/notification/${notificationId}`);
+        notifications.value = notifications.value.filter(
+          (n) => n.id !== notificationId
+        );
+        $q.notify({
+          type: "positive",
+          message: "Notificação deletada com sucesso",
+        });
+        updateUnreadCount();
+      } catch {
+        $q.notify({
+          type: "negative",
+          message: "Erro ao deletar notificação",
+        });
+      }
+    };
+
     // Lifecycle
     onMounted(() => {
       void loadNotifications();
@@ -349,6 +383,7 @@ export default defineComponent({
       markAllAsRead,
       refreshNotifications,
       emitNotification,
+      deleteNotification,
     };
   },
 });

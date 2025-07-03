@@ -523,7 +523,13 @@ const fetchMedicines = async () => {
         category: selectedGroup.value || undefined,
       },
     });
-    medicines.value = response.data;
+    medicines.value = response.data.filter((med: Medicine) => {
+      if (med.days_until_empty !== undefined && med.days_until_empty <= 0) {
+        info(`O medicamento "${med.name}" acabou!`);
+        return false; 
+      }
+      return true;
+    });
     // console.log(response.data);
   } catch (err) {
     const axiosError = err as AxiosError;
