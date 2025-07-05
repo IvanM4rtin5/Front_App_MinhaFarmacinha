@@ -135,7 +135,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import NotificationsDropdown from "src/components/Notify/NotificationsDropdown.vue";
 import ModalNotify from "src/components/Notify/ModalNotify.vue";
-import type { Notification } from "src/types/notification";
+import type { Notification } from "src/types/Notification/notification";
 
 const router = useRouter();
 const leftDrawerOpen = ref(false);

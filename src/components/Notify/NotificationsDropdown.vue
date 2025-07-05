@@ -105,7 +105,7 @@
 import { defineComponent, ref, onMounted, onUnmounted } from "vue";
 import { useQuasar } from "quasar";
 import { api } from "../../boot/axios";
-import type { Notification } from "../../types/notification";
+import type { Notification } from "../../types/Notification/notification";
 
 export default defineComponent({
   name: "NotificationsDropdown",
