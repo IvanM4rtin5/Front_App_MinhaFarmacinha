@@ -25,12 +25,12 @@
           <form @submit.prevent="handleLogin">
             <q-input
               v-model="username"
-              label="Usuário"
+              label="E-mail"
               outlined
               dense
               class="q-mb-md"
               color="blue"
-              autocomplete="username"
+              autocomplete="email"
             />
 
             <q-input
@@ -45,11 +45,7 @@
             />
 
             <div class="row q-gutter-sm">
-              <q-btn
-                label="Entrar"
-                type="submit"
-                color="primary"
-              />
+              <q-btn label="Entrar" type="submit" color="primary" />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
             </div>
             <div class="text-center q-mt-md q-mb-lg">
@@ -86,12 +82,12 @@
           <form @submit.prevent="handleLogin">
             <q-input
               v-model="username"
-              label="Usuário"
+              label="E-mail"
               outlined
               dense
               class="q-mb-md"
               color="blue"
-              autocomplete="username"
+              autocomplete="email"
             />
 
             <q-input
@@ -128,9 +124,9 @@
         </div>
         <div class="login-right">
           <img
-              src="../assets/image/logo-farmacinha.png"
-              alt="Logo Minha Farmacinha"
-            />
+            src="../assets/image/logo-farmacinha.png"
+            alt="Logo Minha Farmacinha"
+          />
         </div>
       </div>
     </template>
@@ -138,15 +134,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
 import { useRouter } from "vue-router";
+import { ref, onMounted, onUnmounted } from "vue";
 import { useAuthStore } from "../stores/auth";
-import { useNotify } from "src/composables/useNotify";
+import { useNotify } from "../composables/useNotify";
 
 const username = ref("");
 const password = ref("");
 const router = useRouter();
-const loginError = ref(false);
 const authStore = useAuthStore();
 const { success, error } = useNotify();
 
@@ -164,22 +159,13 @@ onUnmounted(() => {
 });
 
 const handleLogin = async () => {
-  // console.log(username.value, password.value);
-  try {
-    const user = await authStore.login(username.value, password.value);
-    // console.log("Resultado do login:", user);
-    if (user) {
-      loginError.value = false;
-      success("Login realizado com sucesso!");
-      await router.push("/app/home");
-    } else {
-      loginError.value = true;
-      error("Usuário ou senha incorretos");
-    }
-  } catch (err) {
-    loginError.value = true;
-    error("Erro ao realizar login. Por favor Tente novamente.");
-    console.error("Erro no login:", err);
+  const user = await authStore.login(username.value, password.value, {
+    success,
+    error,
+  });
+
+  if (user) {
+    await router.push("/app/home");
   }
 };
 </script>
