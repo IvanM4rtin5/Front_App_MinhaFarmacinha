@@ -90,6 +90,33 @@ button {
   border: 2px solid transparent;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+.my-notify .q-icon {
+  background-color: white;
+  border-radius: 50%;
+  padding: 3px;
+  margin-right: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 20px; 
+}
+
+.my-notify[data-type="positive"] .q-icon {
+  color: var(--green);
+}
+
+.my-notify[data-type="negative"] .q-icon {
+  color: var(--gray-dark);
+}
+
+.my-notify[data-type="warning"] .q-icon {
+  color: var(--gray-dark);
+}
+
+.my-notify[data-type="info"] .q-icon {
+  color: var(--blue-dark);
+}
+
+
 @media (max-width: 600px) {
   .my-notify {
     max-width: 40vw;
