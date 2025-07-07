@@ -45,8 +45,10 @@
         <q-card bordered class="card-item">
           <q-card-section>
             <div class="text-h6 text-negative">📋 Minhas Listas</div>
-            <div class="text-h4 text-weight-bold q-mt-sm">5</div>
-            <q-btn flat label="Gerenciar" color="negative" class="q-mt-md" />
+            <div class="text-h4 text-weight-bold q-mt-sm">{{ shoppingList }}</div>
+            <q-btn flat label="Gerenciar" color="negative" class="q-mt-md"
+            clickable to="/app/shopping"
+            />
           </q-card-section>
         </q-card>
 
@@ -84,7 +86,7 @@
 
   /*Modal*/
   <q-dialog v-model="layout">
-    <q-card style="min-width: 600px">
+    <q-card style="width: 80vw; max-width: 600px">
       <q-card-section
         class="row items-center"
         style="background-color: var(--blue)"
@@ -94,7 +96,7 @@
 
       <q-card-section>
         <div class="column items-center q-mb-md">
-          <q-avatar size="100px" color="primary" style="color: aquamarine">
+          <q-avatar size="100px" color="primary" style="color: var(--blue-light)">
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{
@@ -140,14 +142,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
+import {api} from "src/boot/axios"
 import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
+import type {Products} from "src/types/StoreList/products";
+import { useNotify } from "src/composables/useNotify";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
+const { error } = useNotify()
 
+const shoppingList = ref(0);
 const layout = ref(false);
 const formData = ref({
   name: name.value,
@@ -185,6 +192,19 @@ const onSubmit = () => {
     console.error("Erro ao atualizar perfil:", error);
   }
 };
+
+const ShoppingList = async () => {
+  try{
+    const response = await api.get<Products[]>("/shopping/");
+    const products = response.data;
+    shoppingList .value = products. length;
+  }catch{
+    error("Erro ao carregar dados da Lista de Produtos")
+  }
+};
+onMounted(()=>{
+  void ShoppingList();
+})
 </script>
 
 <style scoped>

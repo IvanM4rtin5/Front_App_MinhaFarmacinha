@@ -31,7 +31,7 @@
       <q-list padding class="text-white">
         <!-- User (avatar + name + menu) -->
         <div class="q-mt-md q-mb-md flex flex-center column">
-          <q-avatar size="56px" color="primary" text-color="white">
+          <q-avatar size="56px" color="primary" style="color:var(--blue-light);">
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
@@ -39,7 +39,7 @@
           </q-avatar>
 
           <div class="q-mt-sm text-subtitle2 text-white text-center">
-            {{ name || "Usuário" }}
+            {{ name ? name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ') : "Usuário" }}
           </div>
 
           <q-btn dense flat color="primary" label="Opções" class="q-mt-sm">
