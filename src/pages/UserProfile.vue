@@ -84,7 +84,7 @@
     </div>
   </q-page>
 
-  /*Modal*/
+  <!-- /*Modal*/ -->
   <q-dialog v-model="layout">
     <q-card style="width: 80vw; max-width: 600px">
       <q-card-section
