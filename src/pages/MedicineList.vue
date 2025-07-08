@@ -22,35 +22,15 @@
       </div>
     </div>
 
-    <div class="row q-mb-md q-col-gutter-md">
-      <div class="col-md-6 col-12">
-        <q-input
-          v-model="search"
-          dense
-          outlined
-          placeholder="Buscar medicamentos..."
-          class="q-mr-md"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </div>
-      <div class="col-md-6 col-12">
-        <q-select
-          v-model="selectedGroup"
-          :options="groupOptions"
-          dense
-          outlined
-          label="Filtrar por grupo"
-          emit-value
-          map-options
-          clearable
-        />
-      </div>
-    </div>
+    <MedicineFilters
+      :search="search"
+      :selectedGroup="selectedGroup"
+      :categoryOptions="categoryOptions"
+      @update:search="(val) => (search = val)"
+      @update:selectedGroup="(val) => (selectedGroup = val)"
+    />
 
-    <q-card flat bordered class="bg-white">
+    <q-card flat bordered class="bg-white q-mt-md">
       <q-table
         :rows="medicines"
         :columns="columns"
@@ -63,6 +43,17 @@
       >
         <template v-slot:loading>
           <q-inner-loading showing color="primary" />
+        </template>
+        <template v-slot:no-data>
+          <div class="text-center q-pa-md text-grey-7 text-h6">
+            <q-icon
+              name="medical_services"
+              size="md"
+              class="q-mr-sm"
+              color="red"
+            />
+            Nenhum medicamento encontrado.
+          </div>
         </template>
 
         <template v-slot:body-cell-status="props">
@@ -92,8 +83,14 @@
               color="primary"
               icon="edit"
               @click="editMedicine(props.row)"
-            >
-            </q-btn>
+            />
+            <q-btn
+              flat
+              round
+              color="positive"
+              icon="add"
+              @click="addMedicine(props.row)"
+            />
             <q-btn
               flat
               round
@@ -161,8 +158,8 @@
               emit-value
               map-options
             />
-
             <q-input
+              v-if="!isEditing"
               v-model.number="newMedicine.boxes"
               type="number"
               label="Quantidade de caixas"
@@ -266,36 +263,9 @@ import { ref, reactive, watch, onMounted, onUnmounted, computed } from "vue";
 import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
-import { useRoute } from "vue-router";
-
-interface Medicine {
-  id: number;
-  name: string;
-  dosage: number;
-  category: string;
-  frequency: string;
-  schedules: string[];
-  stock: number;
-  status: string;
-  pills_per_box: number;
-  created_at: string;
-  days_until_empty?: number;
-  is_low_stock?: boolean;
-}
-
-interface MedicineForm {
-  id: number;
-  name: string;
-  dosage: number;
-  category: string;
-  frequency: string;
-  schedules: string[];
-  stock: number;
-  pills_per_box: number;
-  boxes: number;
-  created_at?: string;
-  days_until_empty: number;
-}
+import { useRoute, useRouter } from "vue-router";
+import type { Medicine, MedicineForm } from "../types/Medicine/medicine";
+import MedicineFilters from "src/components/Medicine/MedicineFilters.vue";
 
 const loading = ref(false);
 const search = ref("");
@@ -306,27 +276,13 @@ const medicineDialog = ref(false);
 const deleteDialog = ref(false);
 const { success, error, info } = useNotify();
 const route = useRoute();
+const router = useRouter();
 
 const createdAtFormatted = computed(() =>
   newMedicine.created_at
     ? new Date(newMedicine.created_at).toLocaleString("pt-BR")
     : ""
 );
-
-// Options for the selects
-const groupOptions = [
-  { label: "Ansiolíticos", value: "ansioliticos" },
-  { label: "Anti-Depressivos", value: "anti-depressivos" },
-  { label: "Analgésicos", value: "analgesicos" },
-  { label: "Anti-inflamatórios", value: "anti-inflamatorios" },
-  { label: "Antibióticos", value: "antibioticos" },
-  { label: "Antivirais", value: "antivirais" },
-  { label: "Diabetes", value: "diabetes" },
-  { label: "Hipertensão", value: "hipertensao" },
-  { label: "Suplementos", value: "suplementos" },
-  { label: "Vitaminas", value: "vitaminas" },
-  { label: "Outros", value: "outros" },
-];
 
 const categoryOptions = [
   { label: "Ansioliticos", value: "ansioliticos" },
@@ -416,14 +372,6 @@ const columns = [
     sortable: true,
   },
   {
-    name: "created_at",
-    align: "center" as const,
-    label: "Data de inserção",
-    field: "created_at",
-    sortable: true,
-    format: (val: string) => new Date(val).toLocaleDateString("pt-BR"),
-  },
-  {
     name: "actions",
     align: "center" as const,
     label: "Ações",
@@ -479,6 +427,21 @@ const editMedicine = (medicine: Medicine) => {
   medicineDialog.value = true;
 };
 
+const addMedicine = async (medicine: Medicine) => {
+  try {
+    const updatedMedicine = {
+      ...medicine,
+      stock: (medicine.stock ?? 0) + (medicine.pills_per_box ?? 0),
+    };
+    await api.put(`/medication/${medicine.id}`, updatedMedicine);
+    success("Mais uma caixa adicionada ao estoque!");
+    await fetchMedicines();
+  } catch (err) {
+    error("Erro ao adicionar caixa ao medicamento.");
+    console.error(err);
+  }
+};
+
 const confirmDelete = (medicine: Medicine) => {
   medicineToDelete.value = medicine;
   deleteDialog.value = true;
@@ -526,11 +489,47 @@ const fetchMedicines = async () => {
     medicines.value = response.data.filter((med: Medicine) => {
       if (med.days_until_empty !== undefined && med.days_until_empty <= 0) {
         info(`O medicamento "${med.name}" acabou!`);
-        return false; 
+        return false;
       }
       return true;
     });
-    // console.log(response.data);
+    if (route.query.editId) {
+      console.log("editId na query:", route.query.editId);
+      const med = medicines.value.find(
+        (m) => m.id === Number(route.query.editId)
+      );
+      if (med) {
+        editMedicine(med);
+        void router.replace({ query: { ...route.query, editId: undefined } });
+      } else {
+        if (route.query.name && route.query.dosage) {
+          newMedicine.name = String(route.query.name);
+          newMedicine.dosage = Number(route.query.dosage);
+          if (route.query.category)
+            newMedicine.category = String(route.query.category);
+          if (route.query.frequency)
+            newMedicine.frequency = String(route.query.frequency);
+
+          isEditing.value = false;
+          medicineDialog.value = true;
+          info(
+            "Este medicamento não está mais cadastrado. Você pode adicioná-lo novamente."
+          );
+          void router.replace({
+            query: {
+              ...route.query,
+              editId: undefined,
+              name: undefined,
+              dosage: undefined,
+              category: undefined,
+              frequency: undefined,
+            },
+          });
+        } else {
+          error("O medicamento não está mais cadastrado.");
+        }
+      }
+    }
   } catch (err) {
     const axiosError = err as AxiosError;
     console.error(
@@ -597,7 +596,6 @@ const saveMedicine = async () => {
         : undefined;
 
     if (status === 409) {
-
       info(
         "Já existe um medicamento com este nome e dosagem. Edite o medicamento existente."
       );
@@ -625,8 +623,9 @@ const saveMedicine = async () => {
 };
 
 const getStatusColor = (medicine: Medicine): string => {
-  if (medicine.stock <= 3) return "negative";
-  if (medicine.stock <= 10) return "orange";
+  if (medicine.stock <= 7) return "negative";
+  if (medicine.stock <= 15) return "orange";
+  if (medicine.stock >= 15) return "blue";
   return "positive";
 };
 
@@ -656,6 +655,7 @@ watch(
 
 // Carryng out the initial fetch of medicines
 onMounted(async () => {
+  console.log("Componente montado. Query params:", route.query);
   await fetchMedicines();
   // Automatically open modal if it comes from the shopping list
   if (route.query.add === "1") {

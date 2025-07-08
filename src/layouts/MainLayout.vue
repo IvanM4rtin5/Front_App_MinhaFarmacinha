@@ -30,7 +30,7 @@
     <q-drawer v-model="leftDrawerOpen" show-if-above bordered>
       <q-list padding class="text-white">
         <!-- User (avatar + name + menu) -->
-        <div class="q-mt-xl q-mb-md flex flex-center column">
+        <div class="q-mt-md q-mb-md flex flex-center column">
           <q-avatar size="56px" color="primary" text-color="white">
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
@@ -46,21 +46,22 @@
             <q-menu transition-show="rotate" transition-hide="rotate">
               <q-list style="min-width: 90px" class="text-primary">
                 <q-item clickable>
-                  <q-item-section>Configurações</q-item-section>
-                </q-item>
-                <q-item clickable>
                   <q-item-section>Editar perfil</q-item-section>
                 </q-item>
                 <q-separator />
-                <q-item clickable @click="handleUserClick">
-                  <q-item-section><strong>Sair</strong></q-item-section>
+                <q-item clickable>
+                  <q-item-section>Gerar Relatorio</q-item-section>
+                </q-item>
+                <q-separator />
+                <q-item>
+                  <q-item-section>Historico</q-item-section>
                 </q-item>
               </q-list>
             </q-menu>
           </q-btn>
         </div>
 
-        <q-separator spaced color="grey-6" />
+        <q-separator spaced color="primary" />
 
         <q-item clickable to="/app/home" exact>
           <q-item-section avatar
@@ -95,6 +96,12 @@
             ><q-icon name="person" color="primary"
           /></q-item-section>
           <q-item-section>Perfil</q-item-section>
+        </q-item>
+        <q-item clickable @click="handleUserClick()">
+          <q-item-section avatar
+            ><q-icon name="exit_to_app" color="primary"
+          /></q-item-section>
+          <q-item-section>Sair</q-item-section>
         </q-item>
       </q-list>
       <footer class="footer-container">
@@ -135,7 +142,7 @@ import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
 import NotificationsDropdown from "src/components/Notify/NotificationsDropdown.vue";
 import ModalNotify from "src/components/Notify/ModalNotify.vue";
-import type { Notification } from "src/types/notification";
+import type { Notification } from "src/types/Notification/notification";
 
 const router = useRouter();
 const leftDrawerOpen = ref(false);
@@ -164,18 +171,31 @@ function openMessageModal(notification: Notification | null) {
 
 <style>
 .q-drawer {
-  background-color: var(--gray-dark);
+  background: linear-gradient(
+    135deg,
+    var(--blue-dark) 0%,
+    var(--gray-dark) 120%
+  );
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
+
+.q-list {
+  flex: 1 1 auto;
+  overflow-y: auto;
+}
+
 .q-item,
 .q-item-label {
   font-size: 18px;
 }
 
 .footer-container {
-  margin-top: 10px;
+  margin-top: auto;
   padding: 24px 16px;
-  background: linear-gradient(135deg, var(--blue-light) 0%, var(--white) 100%);
-  border-top: 2px solid var(--blue);
+  background: linear-gradient(135deg, var(--blue-light) 0%, var(--blue) 150%);
+  border: 2px solid var(--blue);
 }
 
 .footer-content {
@@ -227,5 +247,12 @@ function openMessageModal(notification: Notification | null) {
   font-size: 12px;
   opacity: 0.8;
   margin: 0;
+}
+
+@media (max-width: 600px) {
+  .footer-container {
+    margin-top: 152px;
+    padding-bottom: 32px;
+  }
 }
 </style>

@@ -28,28 +28,36 @@ export const useAuthStore = defineStore("auth", {
   },
 
   actions: {
-    async login(username: string, password: string): Promise<User | false> {
-      try { 
+    async login(
+      email: string,
+      password: string,
+      notify?: { success: (msg: string) => void; error: (msg: string) => void }
+    ): Promise<User | false> {
+      try {
         const response = await api.post("/auth/login", {
-          username: username,
+          username: email,
           password: password,
         });
 
         if (response.data?.access_token) {
           localStorage.setItem("token", response.data.access_token);
-          api.defaults.headers.common["Authorization"] = `Bearer ${response.data.access_token}`;
+          api.defaults.headers.common[
+            "Authorization"
+          ] = `Bearer ${response.data.access_token}`;
 
           try {
-            console.log("Token recebido:", response.data.access_token);
-            const tokenPayload = JSON.parse(atob(response.data.access_token.split('.')[1]));
+            // console.log("Token recebido:", response.data.access_token);
+            const tokenPayload = JSON.parse(
+              atob(response.data.access_token.split(".")[1])
+            );
             const userId = tokenPayload.sub;
-            console.log("ID extraído do token:", userId); 
+            // console.log("ID extraído do token:", userId);
             const userResponse = await api.get(`/users/${userId}`, {
               headers: {
-                Authorization: `Bearer ${response.data.access_token}`
-              }
+                Authorization: `Bearer ${response.data.access_token}`,
+              },
             });
-            console.log("Resposta do GET /users:", userResponse);
+            // console.log("Resposta do GET /users:", userResponse);
             const userData = userResponse.data;
 
             const user: User = {
@@ -64,19 +72,32 @@ export const useAuthStore = defineStore("auth", {
             localStorage.setItem("user", JSON.stringify(user));
             localStorage.setItem("name", user.name);
 
+            notify?.success("Login realizado com sucesso!");
             return user;
           } catch (error) {
             console.error("Erro ao buscar dados do usuário:", error);
             throw error;
           }
         }
-      } catch (error) {
-        const axiosError = error as AxiosError;
+      } catch (err) {
+        const axiosError = err as AxiosError;
+        const status = axiosError.response?.status;
+
+        switch (status) {
+          case 401:
+            notify?.error("Usuário ou senha incorretos");
+            break;
+          case 404:
+            notify?.error("Usuário não encontrado");
+            break;
+          default:
+            notify?.error("Erro ao realizar login. Por favor tente novamente.");
+        }
+
         console.error(
           "Erro ao fazer login:",
           axiosError.response?.data || axiosError.message
         );
-        throw error;
       }
 
       this.user = false;
@@ -96,7 +117,7 @@ export const useAuthStore = defineStore("auth", {
       localStorage.removeItem("user");
       localStorage.removeItem("token");
       localStorage.removeItem("avatarUrl");
-      
+
       delete api.defaults.headers.common["Authorization"];
     },
 

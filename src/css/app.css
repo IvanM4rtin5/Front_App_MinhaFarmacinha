@@ -1,15 +1,16 @@
 :root {
-  --blue: #0078D7;
-  --blue-dark: #005A9E;
-  --blue-light: #CDEEFF;
-  --green: #00A300;
+  --blue: #0078d7;
+  --blue-dark: #005a9e;
+  --blue-light: #cdeeff;
+  --green: #00a300;
   --green-dark: #008000;
-  --green-light: #A8D5BA;
-  --white: #FFFFFF;
-  --gray-light: #E7E7E7;
+  --green-light: #a8d5ba;
+  --white: #ffffff;
+  --gray-light: #e7e7e7;
   --gray-dark: #333333;
-  --yellow-Calm: #FFDA77;
-  --orange-smooth: #FFB347;
+  --yellow-Calm: #ffda77;
+  --orange-smooth: #ffb347;
+  --drawer-bg: #1a2733;
 }
 
 * {
@@ -39,12 +40,21 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-body, input, textarea, button {
+body,
+input,
+textarea,
+button {
   font-family: Arial, sans-serif;
   font-weight: 400;
 }
 
-h1, h2, h3, h4, h5, h6, strong {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+strong {
   font-weight: 600;
 }
 
@@ -57,14 +67,14 @@ button {
   cursor: not-allowed;
 }
 .q-tooltip {
-  font-size: 14px;  
+  font-size: 14px;
   padding: 14px 20px;
   max-width: 150px;
   text-align: center;
   background: transparent;
   color: var(--gray-dark);
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
   font-weight: 500;
   letter-spacing: 0.5px;
 }
@@ -73,13 +83,40 @@ button {
 }
 .my-notify {
   min-height: 48px;
-  height: 15vh; 
-  opacity: 0.8; 
-  background-color: rgba(255, 255, 255, 0.8); 
-  border-radius: 10px; 
+  height: 15vh;
+  opacity: 0.8;
+  background-color: rgba(255, 255, 255, 0.8);
+  border-radius: 10px;
   border: 2px solid transparent;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2); 
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
 }
+
+.my-notify .q-icon {
+  background-color: white;
+  border-radius: 50%;
+  padding: 3px;
+  margin-right: 12px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  font-size: 20px; 
+}
+
+.my-notify[data-type="positive"] .q-icon {
+  color: var(--green);
+}
+
+.my-notify[data-type="negative"] .q-icon {
+  color: var(--gray-dark);
+}
+
+.my-notify[data-type="warning"] .q-icon {
+  color: var(--gray-dark);
+}
+
+.my-notify[data-type="info"] .q-icon {
+  color: var(--blue-dark);
+}
+
+
 @media (max-width: 600px) {
   .my-notify {
     max-width: 40vw;

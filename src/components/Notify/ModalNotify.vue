@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { defineProps, defineEmits, computed } from "vue";
-import type { Notification } from "src/types/notification";
+import type { Notification } from "src/types/Notification/notification";
 
 const props = defineProps<{
   modelValue: boolean;
