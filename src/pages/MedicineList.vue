@@ -22,35 +22,15 @@
       </div>
     </div>
 
-    <div class="row q-mb-md q-col-gutter-md">
-      <div class="col-md-6 col-12">
-        <q-input
-          v-model="search"
-          dense
-          outlined
-          placeholder="Buscar medicamentos..."
-          class="q-mr-md"
-        >
-          <template v-slot:append>
-            <q-icon name="search" />
-          </template>
-        </q-input>
-      </div>
-      <div class="col-md-6 col-12">
-        <q-select
-          v-model="selectedGroup"
-          :options="groupOptions"
-          dense
-          outlined
-          label="Filtrar por grupo"
-          emit-value
-          map-options
-          clearable
-        />
-      </div>
-    </div>
+    <MedicineFilters
+      :search="search"
+      :selectedGroup="selectedGroup"
+      :categoryOptions="categoryOptions"
+      @update:search="(val) => (search = val)"
+      @update:selectedGroup="(val) => (selectedGroup = val)"
+    />
 
-    <q-card flat bordered class="bg-white">
+    <q-card flat bordered class="bg-white q-mt-md">
       <q-table
         :rows="medicines"
         :columns="columns"
@@ -66,11 +46,11 @@
         </template>
         <template v-slot:no-data>
           <div class="text-center q-pa-md text-grey-7 text-h6">
-            <q-icon 
-            name="medical_services" 
-            size="md" 
-            class="q-mr-sm"
-            color="red"
+            <q-icon
+              name="medical_services"
+              size="md"
+              class="q-mr-sm"
+              color="red"
             />
             Nenhum medicamento encontrado.
           </div>
@@ -178,8 +158,8 @@
               emit-value
               map-options
             />
-
             <q-input
+              v-if="!isEditing"
               v-model.number="newMedicine.boxes"
               type="number"
               label="Quantidade de caixas"
@@ -284,10 +264,8 @@ import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
 import { useRoute, useRouter } from "vue-router";
-import type {
-  Medicine,
-  MedicineForm,
-} from "../types/Medicine/medicine";
+import type { Medicine, MedicineForm } from "../types/Medicine/medicine";
+import MedicineFilters from "src/components/Medicine/MedicineFilters.vue";
 
 const loading = ref(false);
 const search = ref("");
@@ -305,21 +283,6 @@ const createdAtFormatted = computed(() =>
     ? new Date(newMedicine.created_at).toLocaleString("pt-BR")
     : ""
 );
-
-// Options for the selects
-const groupOptions = [
-  { label: "Ansiolíticos", value: "ansioliticos" },
-  { label: "Anti-Depressivos", value: "anti-depressivos" },
-  { label: "Analgésicos", value: "analgesicos" },
-  { label: "Anti-inflamatórios", value: "anti-inflamatorios" },
-  { label: "Antibióticos", value: "antibioticos" },
-  { label: "Antivirais", value: "antivirais" },
-  { label: "Diabetes", value: "diabetes" },
-  { label: "Hipertensão", value: "hipertensao" },
-  { label: "Suplementos", value: "suplementos" },
-  { label: "Vitaminas", value: "vitaminas" },
-  { label: "Outros", value: "outros" },
-];
 
 const categoryOptions = [
   { label: "Ansioliticos", value: "ansioliticos" },
@@ -407,14 +370,6 @@ const columns = [
     label: "Comprimidos/Caixa",
     field: "pills_per_box",
     sortable: true,
-  },
-  {
-    name: "created_at",
-    align: "center" as const,
-    label: "Data de inserção",
-    field: "created_at",
-    sortable: true,
-    format: (val: string) => new Date(val).toLocaleDateString("pt-BR"),
   },
   {
     name: "actions",
@@ -670,7 +625,7 @@ const saveMedicine = async () => {
 const getStatusColor = (medicine: Medicine): string => {
   if (medicine.stock <= 7) return "negative";
   if (medicine.stock <= 15) return "orange";
-  if(medicine.stock >=15) return "blue";
+  if (medicine.stock >= 15) return "blue";
   return "positive";
 };
 
