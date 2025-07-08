@@ -284,10 +284,7 @@ import { api } from "src/boot/axios";
 import type { AxiosError } from "axios";
 import { useNotify } from "src/composables/useNotify";
 import { useRoute, useRouter } from "vue-router";
-import type {
-  Medicine,
-  MedicineForm,
-} from "../types/Medicine/medicine";
+import type {Medicine,MedicineForm} from "../types/Medicine/medicine";
 
 const loading = ref(false);
 const search = ref("");

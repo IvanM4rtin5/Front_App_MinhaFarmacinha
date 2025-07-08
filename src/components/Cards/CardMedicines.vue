@@ -7,7 +7,7 @@
     </div>
 
     <div class="card-grid">
-      <CardNextReminder next-reminder="Omeprazol às 09:00" />
+      <CardNextReminder />
       <CardAIAssistant />
     </div>
   </div>
