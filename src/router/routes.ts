@@ -37,7 +37,12 @@ const routes: RouteRecordRaw[] = [
         path: "chat",
         component: () => import("pages/ChatAssistant.vue"),
         meta: { requiresAuth: true },
-      },  
+      }, 
+      {
+        path: 'calendar',
+        component: () => import('src/components/MedicineCalendar.vue'),
+        name: 'MedicineCalendar'
+      } 
     ],
   },
   {

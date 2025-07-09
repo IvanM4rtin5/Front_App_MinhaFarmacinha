@@ -6,29 +6,61 @@
       <q-btn
         flat
         label="Ver calendário"
-        color="primary"
+        color="negative"
         class="q-mt-md"
-        @click="navigateToMedicines"
+        clickable
+        to="/app/calendar"
       />
     </q-card-section>
   </q-card>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
+import { ref, onMounted } from "vue";
+import { api } from "src/boot/axios";
+import type { Medicine } from "src/types/Medicine/medicine";
 
-const router = useRouter();
+const nextReminder = ref("Nenhum lembrete");
 
-defineProps({
-  nextReminder: {
-    type: String,
-    default: "Nenhum lembrete",
-  },
+onMounted(async () => {
+  try {
+    const response = await api.get<Medicine[]>("/medication/");
+    const medicines = response.data;
+
+    const now = new Date();
+
+    const reminders = medicines.flatMap((med) =>
+      (med.schedules || []).map((time) => {
+        const [hour, minute] = time.split(":").map(Number);
+        const date = new Date();
+        date.setHours(hour ?? 0, minute ?? 0, 0, 0);
+        return {
+          date,
+          name: med.name,
+          dosage: med.dosage,
+        };
+      })
+    );
+
+    const futureReminders = reminders.filter((r) => r.date > now);
+
+    if (futureReminders.length > 0) {
+      futureReminders.sort((a, b) => a.date.getTime() - b.date.getTime());
+      const next = futureReminders[0];
+      if (next) {
+        nextReminder.value = `${next.name} ${
+          next.dosage
+        }mg às ${next.date.toLocaleTimeString("pt-BR", {
+          hour: "2-digit",
+          minute: "2-digit",
+        })}`;
+      }
+    }
+  } catch {
+    nextReminder.value = "Nenhum lembrete";
+  }
 });
 
-const navigateToMedicines = () => {
-  void router.push("/app/medicines");
-};
 </script>
 
 <style scoped>

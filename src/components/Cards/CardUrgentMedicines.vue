@@ -18,7 +18,7 @@
 
     <!-- Modal with table urgent medicines -->
     <q-dialog v-model="showUrgentMedicines">
-      <q-card style="width: 70vw; max-width: 700px">
+      <q-card style="width: 90vw; max-width: 700px">
         <q-card-section class="row items-center bg-negative text-white">
           <div class="text-h6">Medicamentos com Estoque Baixo</div>
         </q-card-section>
@@ -209,7 +209,6 @@ const addAgain = async (medicine:Medicine) => {
 
 const deleteMedicine = async (medicine: Medicine | MedicineToReplace) => {
   if ("id" in medicine) {
-    // Medicamento ativo: pode excluir normalmente
     try {
       await api.delete(`/medication/${medicine.id}`);
       urgentMedicines.value = urgentMedicines.value.filter(

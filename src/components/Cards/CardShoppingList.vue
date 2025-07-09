@@ -21,11 +21,7 @@ import { ref,onMounted } from "vue";
 import { useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { useNotify } from "src/composables/useNotify";
-
-interface Products {
-  id:number
-  name:string
-}
+import type {Products} from "src/types/StoreList/products"
 
 const router = useRouter();
 const shoppingListCount = ref(0);
