@@ -8,6 +8,7 @@ export interface Notification {
   sent_at?: string;
   read_at?: string;
   created_at: string;
-  medication_name?: string;   
-  medication_dosage?: string; 
+  medication_name?: string;
+  medication_dosage?: string;
+  medication_id?: number;
 }

@@ -97,7 +97,7 @@ button {
   padding: 3px;
   margin-right: 12px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  font-size: 20px; 
+  font-size: 20px;
 }
 
 .my-notify[data-type="positive"] .q-icon {
@@ -116,7 +116,6 @@ button {
   color: var(--blue-dark);
 }
 
-
 @media (max-width: 600px) {
   .my-notify {
     max-width: 40vw;
@@ -124,4 +123,15 @@ button {
     padding: 8px 8px;
     font-size: 13px;
   }
+}
+
+.custom-dose-dialog .q-dialog__title {
+  background: var(--blue);
+  color: white;
+  padding: 16px 24px;
+  border-top-left-radius: 8px;
+  border-top-right-radius: 8px;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-align: center;
 }

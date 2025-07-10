@@ -59,6 +59,15 @@
             <q-item-label caption v-if="notification.medication_dosage">
               Dosagem: {{ notification.medication_dosage }}
             </q-item-label>
+            <q-item-label caption v-if="notification.scheduled_for">
+              Horário:
+              {{
+                new Date(notification.scheduled_for).toLocaleTimeString(
+                  "pt-BR",
+                  { hour: "2-digit", minute: "2-digit" }
+                )
+              }}
+            </q-item-label>
           </q-item-section>
 
           <q-item-section side>
@@ -120,7 +129,7 @@ export default defineComponent({
 
     const getNotificationIcon = (type: string): string => {
       const icons = {
-        medication_reminder: "schedule",
+        medication_reminder: "alarm",
         low_stock_alert: "warning",
         medication_expiry: "event_busy",
         refill_reminder: "shopping_cart",
