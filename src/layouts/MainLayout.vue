@@ -31,7 +31,11 @@
       <q-list padding class="text-white">
         <!-- User (avatar + name + menu) -->
         <div class="q-mt-md q-mb-md flex flex-center column">
-          <q-avatar size="56px" color="primary" style="color:var(--blue-light);">
+          <q-avatar
+            size="56px"
+            color="primary"
+            style="color: var(--blue-light)"
+          >
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{ name?.[0]?.toUpperCase() + (name?.[1] ?? "") || "?" }}
@@ -136,7 +140,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from "vue";
+import { ref, nextTick } from "vue";
 import { storeToRefs } from "pinia";
 import { useRouter } from "vue-router";
 import { useAuthStore } from "../stores/auth";
@@ -165,7 +169,9 @@ function handleUserClick() {
 
 function openMessageModal(notification: Notification | null) {
   selectedNotification.value = notification;
-  showModalNotify.value = true;
+  void nextTick(() => {
+    showModalNotify.value = true;
+  });
 }
 </script>
 

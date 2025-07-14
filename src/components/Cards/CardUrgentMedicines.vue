@@ -42,10 +42,10 @@
               Nenhum medicamento encontrado.
             </div>
           </template>
-            <template v-slot:body-cell-stock="props">
+            <template v-slot:body-cell-boxes="props">
               <q-td :props="props" style="font-size: 16px">
                 <q-chip color="negative" text-color="white" dense>
-                  {{ props.row.stock }} Comprimidos
+                  {{ props.row.boxes }} Comprimidos
                 </q-chip>
               </q-td>
             </template>
@@ -143,7 +143,7 @@ const columns = [
   {
     name: "stock",
     align: "center" as const,
-    label: "Estoque",
+    label: "Caixas",
     field: "stock",
     sortable: true,
   },
@@ -196,7 +196,7 @@ const addAgain = async (medicine:Medicine) => {
   try {
     const updatedMedicine = {
       ...medicine,
-      stock: (medicine.stock ?? 0) + (medicine.pills_per_box ?? 0),
+      boxes: (medicine.boxes ?? 0) + 1,
     };
     await api.put(`/medication/${medicine.id}`, updatedMedicine);
     success("Mais uma caixa adicionada ao estoque!");

@@ -129,22 +129,22 @@ export default defineComponent({
 
     const getNotificationIcon = (type: string): string => {
       const icons = {
-        medication_reminder: "alarm",
-        low_stock_alert: "warning",
-        medication_expiry: "event_busy",
-        refill_reminder: "shopping_cart",
-        general: "info",
+        MEDICATION_REMINDER: "alarm",
+        LOW_STOCK_ALERT: "warning",
+        MEDICATION_EXPIRY: "event_busy",
+        REFILL_REMINDER: "shopping_cart",
+        GENERAL: "info",
       };
       return icons[type as keyof typeof icons] || "notifications";
     };
 
     const getNotificationColor = (type: string): string => {
       const colors = {
-        medication_reminder: "primary",
-        low_stock_alert: "warning",
-        medication_expiry: "negative",
-        refill_reminder: "orange",
-        general: "info",
+        MEDICATION_REMINDER: "primary",
+        LOW_STOCK_ALERT: "warning",
+        MEDICATION_EXPIRY: "negative",
+        REFILL_REMINDER: "orange",
+        GENERAL: "info",
       };
       return colors[type as keyof typeof colors] || "grey";
     };
@@ -189,7 +189,6 @@ export default defineComponent({
             console.log("Token expirado");
           }
         }
-
         $q.notify({
           type: "negative",
           message: "Erro ao carregar notificações",
@@ -212,7 +211,7 @@ export default defineComponent({
         ) {
           const axiosError = error as { response?: { status?: number } };
           if (axiosError.response?.status === 401) {
-            console.log("Token expirado");
+            // console.log("Token expirado");
           }
         }
       }
@@ -345,6 +344,7 @@ export default defineComponent({
     };
 
     function emitNotification(notification: Notification) {
+      console.log("Emitindo notification:", notification);
       emit("abrirMensagem", notification);
     }
 

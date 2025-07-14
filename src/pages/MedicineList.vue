@@ -353,7 +353,7 @@ const columns = [
   {
     name: "stock",
     align: "center" as const,
-    label: "Estoque",
+    label: "Estoque/comprimidos",
     field: "stock",
     sortable: true,
   },
@@ -362,13 +362,6 @@ const columns = [
     align: "center" as const,
     label: "Status",
     field: "status",
-    sortable: true,
-  },
-  {
-    name: "pills_per_box",
-    align: "center" as const,
-    label: "Comprimidos/Caixa",
-    field: "pills_per_box",
     sortable: true,
   },
   {
@@ -395,7 +388,6 @@ const newMedicine = reactive<MedicineForm>({
   stock: 0,
   boxes: 1,
   pills_per_box: 1,
-  created_at: "",
   days_until_empty: 0,
 });
 
@@ -421,8 +413,8 @@ const editMedicine = (medicine: Medicine) => {
   newMedicine.schedules = [...medicine.schedules];
   newMedicine.stock = medicine.stock;
   newMedicine.pills_per_box = medicine.pills_per_box;
-  newMedicine.created_at = medicine.created_at;
   newMedicine.days_until_empty = medicine.days_until_empty ?? 0;
+  newMedicine.created_at = medicine.created_at;
   isEditing.value = true;
   medicineDialog.value = true;
 };
@@ -431,7 +423,7 @@ const addMedicine = async (medicine: Medicine) => {
   try {
     const updatedMedicine = {
       ...medicine,
-      stock: (medicine.stock ?? 0) + (medicine.pills_per_box ?? 0),
+      boxes: (medicine.boxes ?? 0) + 1,
     };
     await api.put(`/medication/${medicine.id}`, updatedMedicine);
     success("Mais uma caixa adicionada ao estoque!");

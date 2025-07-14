@@ -10,92 +10,72 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, computed, onMounted } from "vue";
 import VueCal from "vue-cal";
 import "vue-cal/dist/vuecal.css";
-import { useNotify } from "src/composables/useNotify";
-import { api } from "src/boot/axios";
-import type { Medicine } from "src/types/Medicine/medicine";
-import type { Notification } from "src/types/Notification/notification";
+import { storeToRefs } from "pinia";
 import { useQuasar, Dialog } from "quasar";
+import { useMedicinesStore } from "../stores/medicine";
+import { useNotificationStore } from "src/stores/notification";
+import type { CalendarEvent } from "../types/Calendar/eventCalendar";
+import type { AxiosError } from "axios";
 
-interface CalendarEvent {
-  start: Date;
-  end: Date;
-  title: string;
-  category: Medicine["category"];
-  medicineId: number;
-  notificationId: number | null;
-  notificationStatus: string | null;
-}
-const { error } = useNotify();
 const $q = useQuasar();
-const events = ref<CalendarEvent[]>([]);
 const view = ref("day");
 
-onMounted(async () => {
-  await reloadCalendarAndNotifications();
+const medicinesStore = useMedicinesStore();
+const { medicines } = storeToRefs(medicinesStore);
+
+const notificationStore = useNotificationStore();
+const { notifications } = storeToRefs(notificationStore);
+
+onMounted(() => {
+  void notificationStore.fetchNotifications();
+  void medicinesStore.fetchMedicines();
 });
 
-async function reloadCalendarAndNotifications() {
-  try {
-    const [medRes, notifRes] = await Promise.all([
-      api.get<Medicine[]>("/medication/"),
-      api.get("/notification/", { params: { limit: 100 } }),
-    ]);
-    const medicines = medRes.data;
-    const notifications = notifRes.data;
+const events = computed<CalendarEvent[]>(() => {
+  const today = new Date();
+  return medicines.value.flatMap((med) => {
+    if (!med.schedules || !med.days_until_empty) return [];
 
-    const today = new Date();
+    return Array.from({ length: med.days_until_empty }, (_, i) => {
+      const eventDay = new Date(today);
+      eventDay.setDate(today.getDate() + i);
 
-    events.value = medicines.flatMap((med) => {
-      if (!med.schedules || !med.days_until_empty) return [];
+      return (med.schedules || []).map((time) => {
+        const [hour, minute] = time.split(":").map(Number);
+        const start = new Date(
+          eventDay.getFullYear(),
+          eventDay.getMonth(),
+          eventDay.getDate(),
+          hour,
+          minute ?? 0
+        );
 
-      return Array.from({ length: med.days_until_empty }, (_, i) => {
-        const eventDay = new Date(today);
-        eventDay.setDate(today.getDate() + i);
+        // Relaciona notificação pelo horário e medicamento
+        const notification = notifications.value.find(
+          (n) =>
+            n.medication_id === med.id &&
+            n.notification_type === "medication_reminder" &&
+            n.scheduled_for &&
+            new Date(n.scheduled_for).getTime() === start.getTime()
+        );
 
-        return (med.schedules || []).map((time) => {
-          const [hour, minute] = time.split(":").map(Number);
-          const start = new Date(
-            eventDay.getFullYear(),
-            eventDay.getMonth(),
-            eventDay.getDate(),
-            hour,
-            minute ?? 0
-          );
-          const end = new Date(
-            eventDay.getFullYear(),
-            eventDay.getMonth(),
-            eventDay.getDate(),
-            hour,
-            (minute ?? 0) + 30
-          );
+        return {
+          start,
+          end: new Date(start.getTime() + 30 * 60000),
+          title: `${med.name} ${med.dosage}mg`,
+          category: med.category,
+          medicineId: med.id,
+          notificationId: notification ? notification.id : null,
+          notificationStatus: notification ? notification.status : null,
+        };
+      });
+    }).flat();
+  });
+});
 
-          const notification = notifications.find(
-            (n: Notification) =>
-              n.medication_id === med.id &&
-              n.notification_type === "medication_reminder" &&
-              n.scheduled_for &&
-              new Date(n.scheduled_for).getTime() === start.getTime()
-          );
-
-          return {
-            start,
-            end,
-            title: `${med.name} ${med.dosage}mg`,
-            category: med.category,
-            medicineId: med.id,
-            notificationId: notification ? notification.id : null,
-            notificationStatus: notification ? notification.status : null,
-          };
-        });
-      }).flat();
-    });
-  } catch {
-    error("Erro ao buscar medicamentos ou notificações.");
-  }
-}
 function onEventClick(event: CalendarEvent) {
   if (event.notificationStatus === "READ") {
     $q.notify({ type: "info", message: "Dose marcada como tomada!" });
@@ -131,12 +111,10 @@ function onEventClick(event: CalendarEvent) {
 
 async function handleDoseConfirmation(event: CalendarEvent) {
   try {
-    await api.post(`/medication/${event.medicineId}/consume-dose`, {
-      schedule: event.start,
-    });
+    await medicinesStore.consumeDose(event.medicineId, event.start);
 
     if (event.notificationId) {
-      await api.patch(`/notification/${event.notificationId}/read`);
+      await notificationStore.deleteNotification(event.notificationId);
     }
 
     $q.notify({
@@ -144,12 +122,27 @@ async function handleDoseConfirmation(event: CalendarEvent) {
       message: "Dose Realizada com sucesso!",
     });
 
-    await reloadCalendarAndNotifications();
-  } catch {
-    $q.notify({
-      type: "negative",
-      message: "Erro ao realizar dose.",
-    });
+    // Atualize medicamentos e notificações após a ação
+    await medicinesStore.fetchMedicines();
+    await notificationStore.fetchNotifications();
+  } catch (err: unknown) {
+    if (
+      err &&
+      typeof err === "object" &&
+      (err as AxiosError).isAxiosError &&
+      (err as AxiosError).response?.status === 404
+    ) {
+      $q.notify({
+        type: "negative",
+        message: "Este medicamento já foi removido do sistema.",
+      });
+      await medicinesStore.fetchMedicines();
+    } else {
+      $q.notify({
+        type: "negative",
+        message: "Erro ao realizar dose.",
+      });
+    }
   }
 }
 </script>

@@ -12,3 +12,10 @@ export interface Notification {
   medication_dosage?: string;
   medication_id?: number;
 }
+export enum NotificationType {
+  MEDICATION_REMINDER = "MEDICATION_REMINDER",
+  LOW_STOCK_ALERT = "LOW_STOCK_ALERT",
+  MEDICATION_EXPIRY = "MEDICATION_EXPIRY",
+  REFILL_REMINDER = "REFILL_REMINDER",
+  GENERAL = "GENERAL"
+}

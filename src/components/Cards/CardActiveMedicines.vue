@@ -10,7 +10,7 @@
         label="Ver todos"
         color="primary"
         class="q-mt-md"
-        @click="navigateToMedicines"
+        to="/app/medicines"
       />
     </q-card-section>
   </q-card>
@@ -18,22 +18,10 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
-import { useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { useNotify } from "src/composables/useNotify";
+import type { Medicine} from 'src/types/Medicine/medicine';
 
-interface Medicine {
-  id: number;
-  name: string;
-  dosage: string;
-  category: string;
-  frequency: string;
-  schedules: string[];
-  stock: number;
-  status: string;
-}
-
-const router = useRouter();
 const { error } = useNotify();
 const activeMedicinesCount = ref(0);
 
@@ -46,10 +34,6 @@ const fetchMedicinesData = async () => {
     console.error("Erro ao buscar dados dos medicamentos:", err);
     error("Erro ao carregar dados dos medicamentos");
   }
-};
-
-const navigateToMedicines = () => {
-  void router.push("/app/medicines");
 };
 
 onMounted(() => {
