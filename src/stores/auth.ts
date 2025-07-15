@@ -11,14 +11,14 @@ interface User {
 interface AuthState {
   name: string;
   user: User | false;
-  avatarUrl: string | null;
+  avatarUrl: string;
 }
 
 export const useAuthStore = defineStore("auth", {
   state: (): AuthState => ({
     name: localStorage.getItem("name") || "",
     user: JSON.parse(localStorage.getItem("user") || "false"),
-    avatarUrl: null as string | null,
+    avatarUrl: localStorage.getItem("avatarUrl") || "",
   }),
 
   getters: {
@@ -111,7 +111,7 @@ export const useAuthStore = defineStore("auth", {
     logout() {
       this.name = "";
       this.user = false;
-      this.avatarUrl = null;
+      this.avatarUrl = "";
 
       localStorage.removeItem("name");
       localStorage.removeItem("user");

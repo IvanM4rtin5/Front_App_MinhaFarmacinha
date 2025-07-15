@@ -309,11 +309,8 @@ const frequencyOptions = [
   { label: "Antes das refeições", value: "3x ao dia", times: 3 },
   { label: "Após as refeições", value: "3x ao dia", times: 3 },
 ];
-
-// List of medicines
 const medicines = ref<Medicine[]>([]);
 
-// Columns for the table
 const columns = [
   {
     name: "name",
@@ -376,7 +373,6 @@ const columns = [
 const pagination = ref({
   rowsPerPage: 10,
 });
-
 // New medicine reactive object
 const newMedicine = reactive<MedicineForm>({
   id: 0,
@@ -486,7 +482,7 @@ const fetchMedicines = async () => {
       return true;
     });
     if (route.query.editId) {
-      console.log("editId na query:", route.query.editId);
+      // console.log("editId na query:", route.query.editId);
       const med = medicines.value.find(
         (m) => m.id === Number(route.query.editId)
       );
@@ -580,8 +576,6 @@ const saveMedicine = async () => {
       }
     }
   } catch (err: unknown) {
-    console.log("Erro ao salvar medicamento (catch):", err);
-
     const status =
       typeof err === "object" && err !== null && "response" in err
         ? (err as { response?: { status?: number } }).response?.status
@@ -608,7 +602,6 @@ const saveMedicine = async () => {
       }
       return;
     }
-
     error("Erro ao salvar medicamento");
     console.error("Erro ao salvar medicamento:", err);
   }
@@ -620,7 +613,6 @@ const getStatusColor = (medicine: Medicine): string => {
   if (medicine.stock >= 15) return "blue";
   return "positive";
 };
-
 // Watching for changes in search and selectedGroup to refetch medicines
 watch([search, selectedGroup], async () => {
   await fetchMedicines();

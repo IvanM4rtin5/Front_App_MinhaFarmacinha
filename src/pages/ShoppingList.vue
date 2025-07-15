@@ -130,10 +130,10 @@
             class="q-mr-sm"
             color="primary"
             text-color="white"/>
-            <h6 class="q-ml-sm text-primary" >Adicionar como medicamento?</h6>
+            <h6 class="q-ml-sm text-primary" >Adicionar o Produto?</h6>
             <p class="q-mt-md q-ml-lg">
               Deseja adicionar
-              <strong>{{ selectedShoppingItem?.name }}</strong> como medicamento ?
+              <strong>{{ selectedShoppingItem?.name }}</strong> na sua lista medicamento ?
             </p>
         </q-card-section>
         <q-card-actions class="q-mr-md" align="right">
@@ -145,7 +145,7 @@
           <q-btn
             flat
             label="Adicionar"
-            style="background-color: blue;"
+            style="background-color: #1976d2;"
             color="white"
             @click="confirmAddToMedicines"
           />
