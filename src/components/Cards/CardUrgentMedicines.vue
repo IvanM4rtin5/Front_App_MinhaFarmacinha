@@ -45,7 +45,7 @@
             <template v-slot:body-cell-boxes="props">
               <q-td :props="props" style="font-size: 16px">
                 <q-chip color="negative" text-color="white" dense>
-                  {{ props.row.boxes }} Comprimidos
+                  {{ props.row.boxes }} Caixas
                 </q-chip>
               </q-td>
             </template>
@@ -58,7 +58,7 @@
                   round
                   color="primary"
                   icon="add"
-                  size="md"
+                  label="Add caixa"
                   @click="addAgain(props.row)"
                 />
                 <q-btn
@@ -67,6 +67,7 @@
                   round
                   color="positive"
                   icon="edit"
+                  label="Add novamente"
                   size="md"
                   @click="editMedicine(props.row)"
                 />
@@ -76,6 +77,7 @@
                   round
                   color="negative"
                   icon="delete"
+                  label="Apagar"
                   size="md"
                   @click="deleteMedicine(props.row)"
                 />
@@ -85,7 +87,6 @@
                   round
                   color="negative"
                   icon="delete"
-                  size="md"
                   @click="deleteNotificationBySnapshot(props.row)"
                 />
               </q-td>

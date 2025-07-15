@@ -482,7 +482,6 @@ const fetchMedicines = async () => {
       return true;
     });
     if (route.query.editId) {
-      // console.log("editId na query:", route.query.editId);
       const med = medicines.value.find(
         (m) => m.id === Number(route.query.editId)
       );
@@ -570,7 +569,7 @@ const saveMedicine = async () => {
     ) {
       try {
         await api.delete(`/shopping/${route.query.shoppingId}`);
-        success("Medicamento adicionado e removido da lista de compras!");
+        // success("Medicamento adicionado e removido da lista de compras!");
       } catch {
         error("Não foi possível remover o medicamento da lista de compras.");
       }
@@ -583,9 +582,8 @@ const saveMedicine = async () => {
 
     if (status === 409) {
       info(
-        "Já existe um medicamento com este nome e dosagem. Edite o medicamento existente."
+        "Existe um medicamento com este nome e dose. Edite o medicamento existente."
       );
-
       await fetchMedicines();
 
       const existing = medicines.value.find(

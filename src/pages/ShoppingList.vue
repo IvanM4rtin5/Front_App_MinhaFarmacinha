@@ -130,7 +130,7 @@
             class="q-mr-sm"
             color="primary"
             text-color="white"/>
-            <h6 class="q-ml-sm text-primary" >Adicionar o Produto?</h6>
+            <h6 class="q-ml-sm text-primary" >Adicionar Produto?</h6>
             <p class="q-mt-md q-ml-lg">
               Deseja adicionar
               <strong>{{ selectedShoppingItem?.name }}</strong> na sua lista medicamento ?
