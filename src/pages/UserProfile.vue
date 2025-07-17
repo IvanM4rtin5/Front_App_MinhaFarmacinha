@@ -45,9 +45,16 @@
         <q-card bordered class="card-item">
           <q-card-section>
             <div class="text-h6 text-negative">📋 Minhas Listas</div>
-            <div class="text-h4 text-weight-bold q-mt-sm">{{ shoppingList }}</div>
-            <q-btn flat label="Gerenciar" color="negative" class="q-mt-md"
-            clickable to="/app/shopping"
+            <div class="text-h4 text-weight-bold q-mt-sm">
+              {{ shoppingList }}
+            </div>
+            <q-btn
+              flat
+              label="Gerenciar"
+              color="negative"
+              class="q-mt-md"
+              clickable
+              to="/app/shopping"
             />
           </q-card-section>
         </q-card>
@@ -77,14 +84,22 @@
         <q-btn
           class="action-btn"
           color="secondary"
-          icon="settings"
-          label="Configurações"
+          icon="lock"
+          label="Alterar Senha"
+          @click="showPasswordModal = true"
+        />
+        <q-btn
+          class="action-btn"
+          color="negative"
+          icon="delete"
+          label="Deletar Conta"
+          @click="showDeleteModal = true"
         />
       </div>
     </div>
   </q-page>
 
-  <!-- /*Modal*/ -->
+  <!-- Modal de editar perfil -->
   <q-dialog v-model="layout">
     <q-card style="width: 80vw; max-width: 600px">
       <q-card-section
@@ -96,13 +111,25 @@
 
       <q-card-section>
         <div class="column items-center q-mb-md">
-          <q-avatar size="100px" color="primary" style="color: var(--blue-light)">
+          <q-avatar
+            size="100px"
+            color="primary"
+            style="color: var(--blue-light)"
+          >
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{
                 formData.name?.[0]?.toUpperCase() +
                   (formData.name?.[1] ?? "") || "?"
               }}
+              <q-btn
+                round
+                flat
+                icon="edit"
+                size="sm"
+                class="edit-avatar-btn q-mt-sm"
+                @click="handleAvatarUpload"
+              />
             </template>
           </q-avatar>
         </div>
@@ -139,32 +166,95 @@
       </q-card-section>
     </q-card>
   </q-dialog>
+
+  <!-- Modal of change passoword -->
+  <ModalImportant
+    v-model="showPasswordModal"
+    title="Alterar Senha"
+    confirm-label="Salvar"
+    @confirm="handleChangePassword"
+    card-style="width: 90vw; max-width: 350px;"
+  >
+    <q-input
+      v-model="passwordData.current"
+      label="Senha atual"
+      type="password"
+      class="q-mb-sm"
+      dense
+      filled
+    />
+    <q-input
+      v-model="passwordData.new"
+      label="Nova senha"
+      type="password"
+      class="q-mb-sm"
+      dense
+      filled
+    />
+    <q-input
+      v-model="passwordData.confirm"
+      label="Confirmar nova senha"
+      type="password"
+      dense
+      filled
+    />
+  </ModalImportant>
+
+  <!-- Modal importante para deletar conta -->
+  <ModalImportant
+    v-model="showDeleteModal"
+    title="Tem certeza que deseja deletar sua conta?"
+    confirm-label="Deletar"
+    @confirm="handleDeleteAccount"
+  >
+    Esta ação é irreversível. Todos os seus dados serão apagados.
+  </ModalImportant>
 </template>
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
-import {api} from "src/boot/axios"
+import { api } from "src/boot/axios";
 import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
-import type {Products} from "src/types/StoreList/products";
+import ModalImportant from "src/components/Notify/ModalImportant.vue";
+import type { Products } from "src/types/StoreList/products";
 import { useNotify } from "src/composables/useNotify";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
-const { error } = useNotify()
+const { error,info } = useNotify();
 
 const shoppingList = ref(0);
-const layout = ref(false);
+const layout = ref(false); 
+const showPasswordModal = ref(false); 
+const showDeleteModal = ref(false); 
 const formData = ref({
   name: name.value,
   email: typeof user.value === "object" && user.value ? user.value.email : "",
+});
+
+const passwordData = ref({
+  current: "",
+  new: "",
+  confirm: "",
 });
 
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   return emailRegex.test(email);
 };
+
+function handleDeleteAccount() {
+  void authStore.deleteAccount({
+    success: (msg) => {
+      useNotify().success(msg);
+    },
+    error: (msg) => {
+      useNotify().error(msg);
+    },
+  });
+}
 
 const handleAvatarUpload = () => {
   const input = document.createElement("input");
@@ -174,7 +264,7 @@ const handleAvatarUpload = () => {
   input.onchange = (event) => {
     const file = (event.target as HTMLInputElement).files?.[0];
     if (file) {
-      authStore.setAvatar(file);
+      void authStore.uploadAvatar(file);
     }
   };
 
@@ -183,7 +273,7 @@ const handleAvatarUpload = () => {
 
 const onSubmit = () => {
   try {
-    authStore.updateProfile({
+    void authStore.updateProfile({
       name: formData.value.name,
       email: formData.value.email,
     });
@@ -193,18 +283,43 @@ const onSubmit = () => {
   }
 };
 
-const ShoppingList = async () => {
-  try{
-    const response = await api.get<Products[]>("/shopping/");
-    const products = response.data;
-    shoppingList .value = products. length;
-  }catch{
-    error("Erro ao carregar dados da Lista de Produtos")
+const handleChangePassword = () => {
+  if (passwordData.value.current === passwordData.value.new)
+  {
+    info('Senha atual não pode ser igual a nova senha')
+    return false;
+  }
+  try {
+    void authStore.changePassword(
+      passwordData.value.current,
+      passwordData.value.new,
+      {
+        success: (msg) => {
+          useNotify().success(msg);
+        },
+        error: (msg) => {
+          useNotify().error(msg);
+        },
+      }
+    );
+    showPasswordModal.value = false;
+  } catch (error) {
+    console.error("Erro ao alterar senha:", error);
   }
 };
-onMounted(()=>{
+
+const ShoppingList = async () => {
+  try {
+    const response = await api.get<Products[]>("/shopping/");
+    const products = response.data;
+    shoppingList.value = products.length;
+  } catch {
+    error("Erro ao carregar dados da Lista de Produtos");
+  }
+};
+onMounted(() => {
   void ShoppingList();
-})
+});
 </script>
 
 <style scoped>
@@ -309,5 +424,24 @@ onMounted(()=>{
 
 :deep(.text-positive) {
   color: var(--green) !important;
+}
+
+@media (max-width: 600px) {
+  .modal-notify-actions {
+    flex-direction: column !important;
+    gap: 8px;
+  }
+}
+@media (max-width: 600px) {
+  .profile-actions {
+    flex-direction: column;
+    gap: 8px;
+  }
+  .action-btn {
+    min-width: 0;
+    width: 100%;
+    font-size: 0.95rem;
+    padding: 8px 0;
+  }
 }
 </style>

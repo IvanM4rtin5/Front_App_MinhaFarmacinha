@@ -45,7 +45,7 @@
             <template v-slot:body-cell-boxes="props">
               <q-td :props="props" style="font-size: 16px">
                 <q-chip color="negative" text-color="white" dense>
-                  {{ props.row.boxes }} Caixas
+                  {{ props.row.boxes }} Estoque
                 </q-chip>
               </q-td>
             </template>
@@ -144,7 +144,7 @@ const columns = [
   {
     name: "stock",
     align: "center" as const,
-    label: "Caixas",
+    label: "Estoque",
     field: "stock",
     sortable: true,
   },

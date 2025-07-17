@@ -50,7 +50,7 @@
             <q-menu transition-show="rotate" transition-hide="rotate">
               <q-list style="min-width: 90px" class="text-primary">
                 <q-item clickable>
-                  <q-item-section>Editar perfil</q-item-section>
+                  <q-item-section clickable to="/app/profile">Editar perfil</q-item-section>
                 </q-item>
                 <q-separator />
                 <q-item clickable>
