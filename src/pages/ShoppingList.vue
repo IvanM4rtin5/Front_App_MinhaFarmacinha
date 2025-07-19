@@ -1,12 +1,31 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="col">
-      <h5 class="text-primary">
-        Minha Farmacinha <q-icon name="chevron_right" /> Lista de Compras
-      </h5>
-      <p class="text-grey-7">
-        Lista de medicamentos que voçe deseja ou precisa comprar
-      </p>
+  <q-page padding>
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
+        <h5 class="text-primary" style="margin: 0">
+          Minha Farmacinha <q-icon name="chevron_right" /> Lista de Compras
+        </h5>
+        <p class="text-grey-7" style="margin: 0">
+          Lista de medicamentos que você deseja ou precisa comprar
+        </p>
+      </div>
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>
+            Organize e gerencie sua lista de compras de medicamentos de forma
+            simples e eficiente.
+          </p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Adicione novos produtos ou medicamentos à sua lista</li>
+            <li>Marque itens como comprados conforme realiza suas compras</li>
+            <li>Remova produtos que não precisa mais</li>
+            <li>
+              Transfira itens comprados diretamente para sua lista de
+              medicamentos
+            </li>
+          </ul>
+        </InfoPopover>
+      </div>
     </div>
 
     <div class="row q-col-gutter-md q-mb-md">
@@ -125,27 +144,32 @@
 
     <q-dialog v-model="showAddMedicineModal" persistent>
       <q-card>
-        <q-card-section class="row items-center q-ml-sm" >
-            <q-avatar icon="add"
+        <q-card-section class="row items-center q-ml-sm">
+          <q-avatar
+            icon="add"
             class="q-mr-sm"
             color="primary"
-            text-color="white"/>
-            <h6 class="q-ml-sm text-primary" >Adicionar Produto?</h6>
-            <p class="q-mt-md q-ml-lg">
-              Deseja adicionar
-              <strong>{{ selectedShoppingItem?.name }}</strong> na sua lista medicamento ?
-            </p>
+            text-color="white"
+          />
+          <h6 class="q-ml-sm text-primary">Adicionar Produto?</h6>
+          <p class="q-mt-md q-ml-lg">
+            Deseja adicionar
+            <strong>{{ selectedShoppingItem?.name }}</strong> na sua lista
+            medicamento ?
+          </p>
         </q-card-section>
         <q-card-actions class="q-mr-md" align="right">
-          <q-btn flat 
-          label="Cancelar"
-          style="background-color: red;"
-          color="white" 
-          v-close-popup />
+          <q-btn
+            flat
+            label="Cancelar"
+            style="background-color: red"
+            color="white"
+            v-close-popup
+          />
           <q-btn
             flat
             label="Adicionar"
-            style="background-color: #1976d2;"
+            style="background-color: #1976d2"
             color="white"
             @click="confirmAddToMedicines"
           />
@@ -160,6 +184,7 @@ import { ref, onMounted } from "vue";
 import { api } from "src/boot/axios";
 import { useRouter } from "vue-router";
 import { useNotify } from "../composables/useNotify";
+import InfoPopover from "src/components/InfoPopover.vue";
 
 interface ShoppingItem {
   id: number;
@@ -249,7 +274,11 @@ function confirmAddToMedicines() {
   showAddMedicineModal.value = false;
   void router.push({
     path: "/app/medicines",
-    query: { add: "1", name: selectedShoppingItem.value?.name, shoppingId: selectedShoppingItem.value?.id }
+    query: {
+      add: "1",
+      name: selectedShoppingItem.value?.name,
+      shoppingId: selectedShoppingItem.value?.id,
+    },
   });
 }
 
@@ -287,5 +316,4 @@ onMounted(fetchShoppingList);
 .item-large {
   font-size: 18px;
 }
-
 </style>

@@ -1,11 +1,21 @@
 <template>
   <q-page padding>
-    <div class="row items-center q-mb-lg">
-      <div class="col">
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
         <h5 class="text-primary">
           Minha Farmacinha <q-icon name="chevron_right" />Perfil do Usuário
         </h5>
         <p class="text-grey-7">Gerencie suas informações pessoais</p>
+      </div>
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>Gerencie suas informações pessoais de forma simples:</p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Atualize nome, e-mail e foto de perfil</li>
+            <li>Altere sua senha</li>
+            <li>Exclua sua conta, se desejar</li>
+          </ul>
+        </InfoPopover>
       </div>
     </div>
 
@@ -45,9 +55,16 @@
         <q-card bordered class="card-item">
           <q-card-section>
             <div class="text-h6 text-negative">📋 Minhas Listas</div>
-            <div class="text-h4 text-weight-bold q-mt-sm">{{ shoppingList }}</div>
-            <q-btn flat label="Gerenciar" color="negative" class="q-mt-md"
-            clickable to="/app/shopping"
+            <div class="text-h4 text-weight-bold q-mt-sm">
+              {{ shoppingList }}
+            </div>
+            <q-btn
+              flat
+              label="Gerenciar"
+              color="negative"
+              class="q-mt-md"
+              clickable
+              to="/app/shopping"
             />
           </q-card-section>
         </q-card>
@@ -96,7 +113,11 @@
 
       <q-card-section>
         <div class="column items-center q-mb-md">
-          <q-avatar size="100px" color="primary" style="color: var(--blue-light)">
+          <q-avatar
+            size="100px"
+            color="primary"
+            style="color: var(--blue-light)"
+          >
             <img v-if="avatarUrl" :src="avatarUrl" />
             <template v-else>
               {{
@@ -143,16 +164,17 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { api } from "src/boot/axios";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
-import {api} from "src/boot/axios"
+import InfoPopover from "src/components/InfoPopover.vue";
 import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
-import type {Products} from "src/types/StoreList/products";
+import type { Products } from "src/types/StoreList/products";
 import { useNotify } from "src/composables/useNotify";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
-const { error } = useNotify()
+const { error } = useNotify();
 
 const shoppingList = ref(0);
 const layout = ref(false);
@@ -194,17 +216,17 @@ const onSubmit = () => {
 };
 
 const ShoppingList = async () => {
-  try{
+  try {
     const response = await api.get<Products[]>("/shopping/");
     const products = response.data;
-    shoppingList .value = products. length;
-  }catch{
-    error("Erro ao carregar dados da Lista de Produtos")
+    shoppingList.value = products.length;
+  } catch {
+    error("Erro ao carregar dados da Lista de Produtos");
   }
 };
-onMounted(()=>{
+onMounted(() => {
   void ShoppingList();
-})
+});
 </script>
 
 <style scoped>

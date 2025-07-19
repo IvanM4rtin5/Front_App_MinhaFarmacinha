@@ -57,6 +57,10 @@ h6,
 strong {
   font-weight: 600;
 }
+p {
+  font-weight: 500;
+  font-size: 15px;
+}
 
 button {
   cursor: pointer;
@@ -134,4 +138,17 @@ button {
   font-size: 1.2rem;
   font-weight: bold;
   text-align: center;
+}
+.popover-responsive {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 0;
+}
+
+@media (max-width: 600px) { /* md breakpoint do Quasar */
+  .popover-responsive {
+    justify-content: flex-start;
+    margin-top: 0; 
+    margin-left: -264px;
+  }
 }

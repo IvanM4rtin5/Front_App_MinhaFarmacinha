@@ -1,12 +1,36 @@
 <template>
-  <vue-cal
-    locale="pt-br"
-    style="height: 500px"
-    :events="events"
-    :time="true"
-    :view="view"
-    @event-click="onEventClick"
-  />
+  <q-page padding>
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
+        <h5 class="text-primary" style="margin: 0">
+          Minha Farmacinha <q-icon name="chevron_right" /> Calendário
+        </h5>
+      </div>
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>
+            Gerencie e visualize seus horários de medicação de forma prática. No
+            calendário, você pode acompanhar todos os seus lembretes, conferir
+            doses agendadas e marcar medicamentos como tomados.
+          </p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Veja todos os horários de medicação em um só lugar</li>
+            <li>Receba lembretes para não esquecer nenhuma dose</li>
+            <li>Marque medicamentos como tomados diretamente no calendário</li>
+            <li>Visualize o histórico de uso dos seus medicamentos</li>
+          </ul>
+        </InfoPopover>
+      </div>
+    </div>
+    <vue-cal
+      locale="pt-br"
+      style="height: 500px"
+      :events="events"
+      :time="true"
+      :view="view"
+      @event-click="onEventClick"
+    />
+  </q-page>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +43,7 @@ import { useMedicinesStore } from "../stores/medicine";
 import { useNotificationStore } from "src/stores/notification";
 import type { CalendarEvent } from "../types/Calendar/eventCalendar";
 import type { AxiosError } from "axios";
+import InfoPopover from "./InfoPopover.vue";
 
 const $q = useQuasar();
 const view = ref("day");
@@ -146,3 +171,28 @@ async function handleDoseConfirmation(event: CalendarEvent) {
   }
 }
 </script>
+<style scoped>
+.vuecal__event {
+  cursor: pointer;
+}
+:deep(.vuecal__event:hover) {
+  background-color: #e3f2fd;
+}
+:deep(.vuecal__header) {
+  background: linear-gradient(
+    135deg,
+    var(--blue-dark) 0%,
+    var(--gray-dark) 120%
+  );
+  color: #fff;
+}
+:deep(.vuecal__header *) {
+  color: #fff !important;
+}
+:deep(.vuecal__body) {
+  background: linear-gradient(135deg, var(--blue-light) 0%, var(--blue) 150%);
+}
+:deep(.vuecal__body *) {
+  color: #000 !important;
+}
+</style>

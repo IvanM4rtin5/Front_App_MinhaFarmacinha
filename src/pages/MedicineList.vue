@@ -1,7 +1,7 @@
 <template>
   <q-page padding>
-    <div class="row items-center q-mb-lg">
-      <div class="col">
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
         <h5 class="text-primary">
           Minha Farmacinha <q-icon name="chevron_right" /> Meus Medicamentos
         </h5>
@@ -9,19 +9,38 @@
           Lista de medicamentos que voçe está utilizando atualmente.
         </p>
       </div>
-      <div class="col-auto">
-        <q-btn
-          color="negative"
-          icon="add"
-          :label="!isMobile ? 'Adicionar Medicamento' : ''"
-          @click="openAddDialog"
-          class="q-px-md"
-          :round="isMobile"
-          :dense="isMobile"
-        />
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>
+            Gerencie facilmente seus medicamentos nesta página. Você pode
+            adicionar novos medicamentos, editar informações, marcar como em
+            uso, definir lembretes e remover itens da sua lista.
+          </p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Adicione novos medicamentos à sua lista</li>
+            <li>Edite ou exclua medicamentos existentes</li>
+            <!-- <li>Marque medicamentos como ativos ou inativos</li> -->
+            <li>Defina lembretes para horários de uso</li>
+            <li>Visualize detalhes e histórico de uso</li>
+          </ul>
+        </InfoPopover>
       </div>
     </div>
 
+    <div
+      style="display: flex; justify-content: flex-end; width: 100%"
+      class="q-mb-md"
+    >
+      <q-btn
+        color="negative"
+        icon="add"
+        :label="!isMobile ? 'Adicionar Medicamento' : ''"
+        @click="openAddDialog"
+        class="q-px-md"
+        :round="isMobile"
+        :dense="isMobile"
+      />
+    </div>
     <MedicineFilters
       :search="search"
       :selectedGroup="selectedGroup"
@@ -266,6 +285,7 @@ import { useNotify } from "src/composables/useNotify";
 import { useRoute, useRouter } from "vue-router";
 import type { Medicine, MedicineForm } from "../types/Medicine/medicine";
 import MedicineFilters from "src/components/Medicine/MedicineFilters.vue";
+import InfoPopover from "src/components/InfoPopover.vue";
 
 const loading = ref(false);
 const search = ref("");
