@@ -1,11 +1,21 @@
 <template>
   <q-page padding>
-    <div class="row items-center q-mb-lg">
-      <div class="col">
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
         <h5 class="text-primary">
           Minha Farmacinha <q-icon name="chevron_right" />Perfil do Usuário
         </h5>
         <p class="text-grey-7">Gerencie suas informações pessoais</p>
+      </div>
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>Gerencie suas informações pessoais de forma simples:</p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Atualize nome, e-mail e foto de perfil</li>
+            <li>Altere sua senha</li>
+            <li>Exclua sua conta, se desejar</li>
+          </ul>
+        </InfoPopover>
       </div>
     </div>
 
@@ -213,8 +223,11 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { api } from "src/boot/axios";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
+import InfoPopover from "src/components/InfoPopover.vue";
+import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 import { api } from "src/boot/axios";
 import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 import ModalImportant from "src/components/Notify/ModalImportant.vue";
@@ -224,6 +237,7 @@ import { useNotify } from "src/composables/useNotify";
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
 const { error,info } = useNotify();
+
 
 const shoppingList = ref(0);
 const layout = ref(false); 

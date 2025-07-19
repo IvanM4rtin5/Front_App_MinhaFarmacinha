@@ -1,14 +1,28 @@
 <template>
-  <q-page class="q-pa-md">
-    <div class="row items-center q-mb-lg">
-      <div class="col">
+  <q-page padding>
+    <div class="row q-col-gutter-md q-mb-lg">
+      <div class="col-12 col-md-6">
         <h5 class="text-primary">
-          Minha Farmacinha <q-icon name="chevron_right" /> Farmacinha Responde
+          Minha Farmacinha <q-icon name="chevron_right" /> Farmacinha Responde !
         </h5>
         <p class="text-grey-7">Tire aqui suas duvidas sobre medicamentos</p>
       </div>
+      <div class="col-12 col-md-6">
+        <InfoPopover class="popover-responsive">
+          <p>
+            Converse com o assistente virtual para tirar dúvidas sobre
+            medicamentos, uso correto, horários e outras informações importantes
+            para sua saúde.
+          </p>
+          <ul style="margin: 0; padding-left: 18px">
+            <li>Solicite orientações sobre horários e dosagens</li>
+            <li>Peça dicas para organização da sua farmacinha</li>
+            <li>Receba respostas rápidas e confiáveis</li>
+          </ul>
+        </InfoPopover>
+      </div>
     </div>
-    <h3 class="text-center text-primary">Bem - vindo</h3>
+    <h3 class="text-center gradient-text">Bem - vindo</h3>
     <div class="chat-container">
       <div class="chat-messages">
         <q-chat-message
@@ -44,7 +58,8 @@ import { ref } from "vue";
 import { useAuthStore } from "src/stores/auth";
 import { storeToRefs } from "pinia";
 import logoFarmacinha from "src/assets/image/favicon-96x96.png";
-import avatarDefault from "src/assets/image/avatarDefault.png"
+import avatarDefault from "src/assets/image/avatarDefault.png";
+import InfoPopover from "src/components/InfoPopover.vue";
 
 const authStore = useAuthStore();
 const { name, avatarUrl } = storeToRefs(authStore);
@@ -132,5 +147,16 @@ function sendMessage() {
 .chat-input {
   display: flex;
   align-items: center;
+}
+.gradient-text {
+  background: linear-gradient(
+    135deg,
+    var(--blue-dark) 0%,
+    var(--gray-dark) 120%
+  );
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  color: transparent;
 }
 </style>

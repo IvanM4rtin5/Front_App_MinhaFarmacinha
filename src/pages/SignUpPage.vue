@@ -38,6 +38,7 @@
               <q-input
                 v-model="date"
                 type="date"
+                label="Data de Nascimento"
                 outlined
                 dense
                 class="q-mb-md"
