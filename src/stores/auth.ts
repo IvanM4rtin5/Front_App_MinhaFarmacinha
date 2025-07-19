@@ -108,6 +108,25 @@ export const useAuthStore = defineStore("auth", {
       return false;
     },
 
+    async deleteAccount(notify?: {
+      success: (msg: string) => void;
+      error: (msg: string) => void;
+    }) {
+      try {
+        await api.delete("/users/account", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        this.logout();
+        notify?.success("Conta deletada com sucesso!");
+      } catch (error) {
+        notify?.error("Erro ao deletar conta");
+        console.error(error);
+      }
+    },
+
     logout() {
       this.name = "";
       this.user = false;
@@ -121,27 +140,96 @@ export const useAuthStore = defineStore("auth", {
       delete api.defaults.headers.common["Authorization"];
     },
 
-    setAvatar(file: File) {
-      const reader = new FileReader();
-      reader.onload = (e) => {
-        const base64 = e.target?.result as string;
-        this.avatarUrl = base64;
-        localStorage.setItem("avatarUrl", base64);
-      };
-      reader.readAsDataURL(file);
-    },
+    async uploadAvatar(
+      file: File,
+      notify?: { success: (msg: string) => void; error: (msg: string) => void }
+    ) {
+      const formData = new FormData();
+      formData.append("file", file);
 
-    updateProfile(profileData: { name: string; email: string }) {
-      this.name = profileData.name;
-      if (this.user && typeof this.user === "object") {
-        this.user = {
-          ...this.user,
-          email: profileData.email,
-        };
+      try {
+        const response = await api.post("/users/avatar", formData, {
+          headers: {
+            "Content-Type": "multipart/form-data",
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
+          },
+        });
+
+        if (response.data?.avatar) {
+          this.avatarUrl = `data:image/png;base64,${response.data.avatar}`;
+          localStorage.setItem("avatarUrl", this.avatarUrl);
+          notify?.success("Avatar atualizado com sucesso!");
+        }
+      } catch (error) {
+        notify?.error("Erro ao atualizar avatar");
+        console.error(error);
       }
+    },
+    async changePassword(
+      oldPassword: string,
+      newPassword: string,
+      notify?: { success: (msg: string) => void; error: (msg: string) => void }
+    ) {
+      try {
+        await api.post(
+          "/users/change-password",
+          {
+            old_password: oldPassword,
+            new_password: newPassword,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
+        notify?.success("Senha alterada com sucesso!");
+      } catch (error) {
+        const axiosError = error as AxiosError;
+        const detail = (axiosError.response?.data as { detail?: string })
+          ?.detail;
+        if (detail) {
+          notify?.error(detail);
+        } else {
+          notify?.error("Erro ao alterar senha");
+        }
+        console.error(error);
+      }
+    },
+    async updateProfile(
+      profileData: { name: string; email: string },
+      notify?: { success: (msg: string) => void; error: (msg: string) => void }
+    ) {
+      try {
+        const response = await api.put(
+          "/users/profile",
+          {
+            username: profileData.name,
+            email: profileData.email,
+          },
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          }
+        );
 
-      localStorage.setItem("name", profileData.name);
-      localStorage.setItem("user", JSON.stringify(this.user));
+        const userData = response.data;
+        this.name = userData.username;
+        if (this.user && typeof this.user === "object") {
+          this.user = {
+            ...this.user,
+            name: userData.username,
+            email: userData.email,
+          };
+        }
+        localStorage.setItem("name", userData.username);
+        localStorage.setItem("user", JSON.stringify(this.user));
+        notify?.success("Perfil atualizado com sucesso!");
+      } catch (error) {
+        notify?.error("Erro ao atualizar perfil");
+        console.error(error);
+      }
     },
   },
 });
