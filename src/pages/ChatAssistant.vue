@@ -151,8 +151,8 @@ function sendMessage() {
 .gradient-text {
   background: linear-gradient(
     135deg,
-    var(--blue-dark) 0%,
-    var(--gray-dark) 120%
+    var(--blue) 0%,
+    var(--blue-dark) 120%
   );
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;

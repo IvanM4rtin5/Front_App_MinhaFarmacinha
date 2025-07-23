@@ -142,13 +142,27 @@
               readonly
               disable
             />
-            <q-input
+            <q-select
               v-model="newMedicine.name"
+              use-input
+              input-debounce="300"
+              :options="suggestions"
+              option-label="nome_medicamento"
+              option-value="nome_medicamento"
+              emit-value
+              @filter="
+                (val, update) => {
+                  fetchSuggestions(val).then((result) => {
+                    console.log('Sugestões recebidas:', result);
+                    suggestions = result;
+                    update(result);
+                  });
+                }
+              "
               label="Nome do medicamento"
-              :rules="[(val) => !!val || 'Nome é obrigatório']"
+              clearable
               outlined
             />
-
             <q-input
               v-model="newMedicine.dosage"
               type="number"
@@ -287,16 +301,18 @@ import type { Medicine, MedicineForm } from "../types/Medicine/medicine";
 import MedicineFilters from "src/components/Medicine/MedicineFilters.vue";
 import InfoPopover from "src/components/InfoPopover.vue";
 
-const loading = ref(false);
 const search = ref("");
-const selectedGroup = ref<string | null>(null);
-const isEditing = ref(false);
-const medicineToDelete = ref<Medicine | null>(null);
-const medicineDialog = ref(false);
-const deleteDialog = ref(false);
-const { success, error, info } = useNotify();
 const route = useRoute();
 const router = useRouter();
+const loading = ref(false);
+const suggestions = ref<{ nome_medicamento: string }[]>([]);
+const isEditing = ref(false);
+const deleteDialog = ref(false);
+const medicineDialog = ref(false);
+// const loadingSuggestions = ref(false);
+const { success, error, info } = useNotify();
+const selectedGroup = ref<string | null>(null);
+const medicineToDelete = ref<Medicine | null>(null);
 
 const createdAtFormatted = computed(() =>
   newMedicine.created_at
@@ -549,6 +565,18 @@ const fetchMedicines = async () => {
   }
 };
 
+const fetchSuggestions = async (query: string | null) => {
+  if (!query || query.length < 2) return [];
+  try {
+    const response = await api.get("/medication/autocomplete", {
+      params: { q: query },
+    });
+    return response.data;
+  } catch {
+    return [];
+  }
+};
+
 const saveMedicine = async () => {
   if (
     !newMedicine.name ||
@@ -589,7 +617,6 @@ const saveMedicine = async () => {
     ) {
       try {
         await api.delete(`/shopping/${route.query.shoppingId}`);
-        // success("Medicamento adicionado e removido da lista de compras!");
       } catch {
         error("Não foi possível remover o medicamento da lista de compras.");
       }
@@ -613,7 +640,6 @@ const saveMedicine = async () => {
           m.dosage === newMedicine.dosage
       );
       if (existing) {
-        // console.log(existing);
         error(
           "Não foi possível localizar o medicamento duplicado para edição."
         );
@@ -631,7 +657,7 @@ const getStatusColor = (medicine: Medicine): string => {
   if (medicine.stock >= 15) return "blue";
   return "positive";
 };
-// Watching for changes in search and selectedGroup to refetch medicines
+
 watch([search, selectedGroup], async () => {
   await fetchMedicines();
 });

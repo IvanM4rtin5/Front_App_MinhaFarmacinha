@@ -226,13 +226,11 @@ import { ref, onMounted } from "vue";
 import { api } from "src/boot/axios";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
+import { useNotify } from "src/composables/useNotify";
 import InfoPopover from "src/components/InfoPopover.vue";
-import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
-import { api } from "src/boot/axios";
-import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 import ModalImportant from "src/components/Notify/ModalImportant.vue";
 import type { Products } from "src/types/StoreList/products";
-import { useNotify } from "src/composables/useNotify";
+import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);

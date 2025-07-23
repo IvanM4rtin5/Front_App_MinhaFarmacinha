@@ -130,12 +130,10 @@ export const useAuthStore = defineStore("auth", {
     logout() {
       this.name = "";
       this.user = false;
-      this.avatarUrl = "";
 
       localStorage.removeItem("name");
       localStorage.removeItem("user");
       localStorage.removeItem("token");
-      localStorage.removeItem("avatarUrl");
 
       delete api.defaults.headers.common["Authorization"];
     },
