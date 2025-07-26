@@ -188,26 +188,50 @@
     <q-input
       v-model="passwordData.current"
       label="Senha atual"
-      type="password"
+      :type="isPwdCurrent ? 'password' : 'text'"
       class="q-mb-sm"
       dense
       filled
-    />
+    >
+      <template v-slot:append>
+        <q-icon
+          :name="isPwdCurrent ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwdCurrent = !isPwdCurrent"
+        />
+      </template>
+    </q-input>
     <q-input
       v-model="passwordData.new"
       label="Nova senha"
-      type="password"
+      :type="isPwdNew ? 'password' : 'text'"
       class="q-mb-sm"
       dense
       filled
-    />
+    >
+      <template v-slot:append>
+        <q-icon
+          :name="isPwdNew ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwdNew = !isPwdNew"
+        />
+      </template>
+    </q-input>
     <q-input
       v-model="passwordData.confirm"
       label="Confirmar nova senha"
-      type="password"
+      :type="isPwdConfirm ? 'password' : 'text'"
       dense
       filled
-    />
+    >
+      <template v-slot:append>
+        <q-icon
+          :name="isPwdConfirm ? 'visibility_off' : 'visibility'"
+          class="cursor-pointer"
+          @click="isPwdConfirm = !isPwdConfirm"
+        />
+      </template>
+    </q-input>
   </ModalImportant>
 
   <!-- Modal importante para deletar conta -->
@@ -234,13 +258,12 @@ import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
-const { error,info } = useNotify();
-
+const { error, info } = useNotify();
 
 const shoppingList = ref(0);
-const layout = ref(false); 
-const showPasswordModal = ref(false); 
-const showDeleteModal = ref(false); 
+const layout = ref(false);
+const showPasswordModal = ref(false);
+const showDeleteModal = ref(false);
 const formData = ref({
   name: name.value,
   email: typeof user.value === "object" && user.value ? user.value.email : "",
@@ -251,6 +274,10 @@ const passwordData = ref({
   new: "",
   confirm: "",
 });
+
+const isPwdCurrent = ref(true);
+const isPwdNew = ref(true);
+const isPwdConfirm = ref(true);
 
 const isValidEmail = (email: string) => {
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
@@ -296,9 +323,8 @@ const onSubmit = () => {
 };
 
 const handleChangePassword = () => {
-  if (passwordData.value.current === passwordData.value.new)
-  {
-    info('Senha atual não pode ser igual a nova senha')
+  if (passwordData.value.current === passwordData.value.new) {
+    info("Senha atual não pode ser igual a nova senha");
     return false;
   }
   try {

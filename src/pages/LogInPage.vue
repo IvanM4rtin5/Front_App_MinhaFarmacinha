@@ -36,13 +36,21 @@
             <q-input
               v-model="password"
               label="Senha"
-              type="password"
+              :type="isPwd ? 'password' : 'text'"
               autocomplete="current-password"
               outlined
               dense
               class="q-mb-lg"
               color="blue"
-            />
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
 
             <div class="row q-gutter-sm">
               <q-btn label="Entrar" type="submit" color="primary" />
@@ -93,13 +101,21 @@
             <q-input
               v-model="password"
               label="Senha"
-              type="password"
+              :type="isPwd ? 'password' : 'text'"
               autocomplete="current-password"
               outlined
               dense
               class="q-mb-lg"
               color="blue"
-            />
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
 
             <div class="row q-gutter-sm">
               <q-btn
@@ -141,6 +157,7 @@ import { useNotify } from "../composables/useNotify";
 
 const username = ref("");
 const password = ref("");
+const isPwd = ref(true);
 const router = useRouter();
 const authStore = useAuthStore();
 const { success, error } = useNotify();

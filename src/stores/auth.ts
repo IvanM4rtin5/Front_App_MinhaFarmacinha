@@ -6,6 +6,7 @@ interface User {
   id: number;
   name: string;
   email: string;
+  avatar: string;
 }
 
 interface AuthState {
@@ -64,13 +65,18 @@ export const useAuthStore = defineStore("auth", {
               id: userData.id,
               name: userData.username,
               email: userData.email,
+              avatar: userData.avatar,
             };
 
             this.user = user;
             this.name = user.name;
+            this.avatarUrl = user.avatar
+              ? `data:image/png;base64,${user.avatar}`
+              : "";
 
             localStorage.setItem("user", JSON.stringify(user));
             localStorage.setItem("name", user.name);
+            localStorage.setItem("avatarUrl", this.avatarUrl);
 
             notify?.success("Login realizado com sucesso!");
             return user;

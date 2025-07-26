@@ -1,210 +1,242 @@
 <template>
   <div class="signup-page">
-      <template v-if="isMobile">
-        <div class="signup-card">
-          <div class="signup-blue-bg top"></div>
-          <img
-            src="../assets/image/favicon-96x96.png"
-            alt="Logo Minha Farmacinha"
-            class="logo-img"
-          />
-          <div class="signup-form-content">
-            <div
-              class="text-h5 text-primary q-mb-sm text-center"
-              style="font-weight: bold; font-size: 22px;"
-            >
-              CRIAR CONTA
-            </div>
-            <div
-              class="text-subtitle2 q-mb-lg text-center"
-              style="color: var(--gray-dark); font-size: 14px"
-            >
-              Preencha os dados abaixo para criar sua conta na
-              <strong>Minha Farmacinha</strong>
-            </div>
-            <form @submit.prevent="handleSignUp">
-              <!-- Nome -->
-              <q-input
-                v-model="name"
-                label="Nome Completo"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Data de nascimento -->
-              <q-input
-                v-model="date"
-                type="date"
-                label="Data de Nascimento"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              >
-                <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
-              </q-input>
-
-              <!-- Email -->
-              <q-input
-                v-model="email"
-                label="E-mail"
-                type="email"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Senha -->
-              <q-input
-                v-model="password"
-                label="Senha"
-                type="password"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Confirmar senha -->
-              <q-input
-                v-model="confirmPassword"
-                label="Confirmar Senha"
-                type="password"
-                outlined
-                dense
-                class="q-mb-lg"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <div class="row q-gutter-sm buttons-container">
-                <q-btn
-                  label="Cadastrar"
-                  type="submit"
-                  color="primary"
-                  class="action-button"
-                />
-                <q-btn
-                  label="Cancelar"
-                  color="negative"
-                  class="action-button"
-                  @click="goToLogin"
-                />
-              </div>
-            </form>
+    <template v-if="isMobile">
+      <div class="signup-card">
+        <div class="signup-blue-bg top"></div>
+        <img
+          src="../assets/image/favicon-96x96.png"
+          alt="Logo Minha Farmacinha"
+          class="logo-img"
+        />
+        <div class="signup-form-content">
+          <div
+            class="text-h5 text-primary q-mb-sm text-center"
+            style="font-weight: bold; font-size: 22px"
+          >
+            CRIAR CONTA
           </div>
-          <div class="signup-blue-bg bottom"></div>
-        </div>
-      </template>
-      <template v-else>
-        <div class="signup-container">
-          <div class="signup-left">
-            <div
-              class="text-h5 text-primary q-mb-sm"
-              style="font-weight: bold; font-size: 27px"
-            >
-              CRIAR CONTA
-            </div>
-            <div
-              class="text-subtitle2 q-mb-lg"
-              style="color: var(--gray-dark); font-size: 15px"
-            >
-              Preencha os dados abaixo para criar sua conta na
-              <strong>Minha Farmacinha</strong>
-            </div>
-            <form @submit.prevent="handleSignUp">
-              <!-- Nome -->
-              <q-input
-                v-model="name"
-                label="Nome Completo"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Data de nascimento -->
-              <q-input
-                v-model="date"
-                type="date"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              >
-                <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
-              </q-input>
-
-              <!-- Email -->
-              <q-input
-                v-model="email"
-                label="E-mail"
-                type="email"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Senha -->
-              <q-input
-                v-model="password"
-                label="Senha"
-                type="password"
-                outlined
-                dense
-                class="q-mb-md"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <!-- Confirmar senha -->
-              <q-input
-                v-model="confirmPassword"
-                label="Confirmar Senha"
-                type="password"
-                outlined
-                dense
-                class="q-mb-lg"
-                color="blue"
-                :input-style="{ fontSize: '16px' }"
-              />
-
-              <div class="row q-gutter-sm buttons-container">
-                <q-btn
-                  label="Cadastrar"
-                  type="submit"
-                  color="primary"
-                  class="action-button"
-                />
-                <q-btn
-                  label="Cancelar"
-                  color="negative"
-                  class="action-button"
-                  @click="goToLogin"
-                />
-              </div>
-            </form>
+          <div
+            class="text-subtitle2 q-mb-lg text-center"
+            style="color: var(--gray-dark); font-size: 14px"
+          >
+            Preencha os dados abaixo para criar sua conta na
+            <strong>Minha Farmacinha</strong>
           </div>
-          <div class="signup-right">
-            <img
-              src="../assets/image/logo-farmacinha.png"
-              alt="Logo Minha Farmacinha"
+          <form @submit.prevent="handleSignUp">
+            <!-- Nome -->
+            <q-input
+              v-model="name"
+              label="Nome Completo"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
             />
-          </div>
+
+            <!-- Data de nascimento -->
+            <q-input
+              v-model="date"
+              type="date"
+              label="Data de Nascimento"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
+            </q-input>
+
+            <!-- Email -->
+            <q-input
+              v-model="email"
+              label="E-mail"
+              type="email"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            />
+
+            <!-- Senha -->
+            <q-input
+              v-model="password"
+              label="Senha"
+              :type="isPwd ? 'password' : 'text'"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+
+            <!-- Confirmar senha -->
+            <q-input
+              v-model="confirmPassword"
+              label="Confirmar Senha"
+              :type="isPwdConfirm ? 'password' : 'text'"
+              outlined
+              dense
+              class="q-mb-lg"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwdConfirm ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwdConfirm = !isPwdConfirm"
+                />
+              </template>
+            </q-input>
+
+            <div class="row q-gutter-sm buttons-container">
+              <q-btn
+                label="Cadastrar"
+                type="submit"
+                color="primary"
+                class="action-button"
+              />
+              <q-btn
+                label="Cancelar"
+                color="negative"
+                class="action-button"
+                @click="goToLogin"
+              />
+            </div>
+          </form>
         </div>
-      </template>
-    </div>
+        <div class="signup-blue-bg bottom"></div>
+      </div>
+    </template>
+    <template v-else>
+      <div class="signup-container">
+        <div class="signup-left">
+          <div
+            class="text-h5 text-primary q-mb-sm text-center"
+            style="font-weight: bold; font-size: 27px"
+          >
+            CRIAR CONTA
+          </div>
+          <div
+            class="text-subtitle2 q-mb-lg text-center"
+            style="color: var(--gray-dark); font-size: 15px"
+          >
+            Preencha os dados abaixo para criar sua conta na
+            <strong>Minha Farmacinha</strong>
+          </div>
+          <form @submit.prevent="handleSignUp">
+            <!-- Nome -->
+            <q-input
+              v-model="name"
+              label="Nome Completo"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            />
+
+            <!-- Data de nascimento -->
+            <q-input
+              v-model="date"
+              type="date"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
+            </q-input>
+
+            <!-- Email -->
+            <q-input
+              v-model="email"
+              label="E-mail"
+              type="email"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            />
+
+            <!-- Senha -->
+            <q-input
+              v-model="password"
+              label="Senha"
+              :type="isPwd ? 'password' : 'text'"
+              outlined
+              dense
+              class="q-mb-md"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwd ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwd = !isPwd"
+                />
+              </template>
+            </q-input>
+
+            <!-- Confirmar senha -->
+            <q-input
+              v-model="confirmPassword"
+              label="Confirmar Senha"
+              :type="isPwdConfirm ? 'password' : 'text'"
+              outlined
+              dense
+              class="q-mb-lg"
+              color="blue"
+              :input-style="{ fontSize: '16px' }"
+            >
+              <template v-slot:append>
+                <q-icon
+                  :name="isPwdConfirm ? 'visibility_off' : 'visibility'"
+                  class="cursor-pointer"
+                  @click="isPwdConfirm = !isPwdConfirm"
+                />
+              </template>
+            </q-input>
+
+            <div class="row q-gutter-sm buttons-container">
+              <q-btn
+                label="Cadastrar"
+                type="submit"
+                color="primary"
+                class="action-button"
+              />
+              <q-btn
+                label="Cancelar"
+                color="negative"
+                class="action-button"
+                @click="goToLogin"
+              />
+            </div>
+          </form>
+        </div>
+        <div class="signup-right">
+          <img
+            src="../assets/image/logo-farmacinha.png"
+            alt="Logo Minha Farmacinha"
+          />
+        </div>
+      </div>
+    </template>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -218,6 +250,8 @@ const date = ref("");
 const email = ref("");
 const password = ref("");
 const confirmPassword = ref("");
+const isPwd = ref(true);
+const isPwdConfirm = ref(true);
 const loading = ref(false);
 const router = useRouter();
 const { success, error } = useNotify();

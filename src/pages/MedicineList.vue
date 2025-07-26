@@ -167,7 +167,7 @@
               v-model="newMedicine.dosage"
               type="number"
               step="0.01"
-              label="Dosagem (Mg ou Unidade)"
+              label="Dosagem (Mg / Ml / UI / etc.)"
               :rules="[(val) => !!val || 'Informe a Dosagem']"
               outlined
             />
