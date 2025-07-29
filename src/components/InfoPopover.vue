@@ -1,5 +1,5 @@
 <template>
-  <div style="display: flex; justify-content: flex-end; width: 100%">
+  <div >
     <q-btn
       flat
       color="primary"

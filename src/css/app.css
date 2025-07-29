@@ -148,7 +148,14 @@ button {
 @media (max-width: 600px) { /* md breakpoint do Quasar */
   .popover-responsive {
     justify-content: flex-start;
-    margin-top: 0; 
-    margin-left: -264px;
+    margin-top: 0;
+    margin-left: -15px;
   }
+}
+
+.q-menu {
+  background: rgba(255, 255, 255, 0.945) !important;
+  backdrop-filter: blur(2px);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.12);
+  border-radius: 10px;
 }

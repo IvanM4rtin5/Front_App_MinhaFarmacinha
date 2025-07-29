@@ -9,8 +9,8 @@
           Lista de medicamentos que voçe está utilizando atualmente.
         </p>
       </div>
-      <div class="col-12 col-md-6">
-        <InfoPopover class="popover-responsive">
+      
+        <InfoPopover class="col-12 col-md-6 popover-responsive">
           <p>
             Gerencie facilmente seus medicamentos nesta página. Você pode
             adicionar novos medicamentos, editar informações, marcar como em
@@ -24,7 +24,6 @@
             <li>Visualize detalhes e histórico de uso</li>
           </ul>
         </InfoPopover>
-      </div>
     </div>
 
     <div
@@ -95,29 +94,13 @@
         </template>
 
         <template v-slot:body-cell-actions="props">
-          <q-td :props="props" class="q-gutter-sm">
-            <q-btn
-              flat
-              round
-              color="primary"
-              icon="edit"
-              @click="editMedicine(props.row)"
+          <q-td :props="props">
+            <ButtonAction
+              :row="props.row"
+              @edit="editMedicine"
+              @add="addMedicine"
+              @delete="confirmDelete"
             />
-            <q-btn
-              flat
-              round
-              color="positive"
-              icon="add"
-              @click="addMedicine(props.row)"
-            />
-            <q-btn
-              flat
-              round
-              color="negative"
-              icon="delete"
-              @click="confirmDelete(props.row)"
-            >
-            </q-btn>
           </q-td>
         </template>
       </q-table>
@@ -300,6 +283,7 @@ import { useRoute, useRouter } from "vue-router";
 import type { Medicine, MedicineForm } from "../types/Medicine/medicine";
 import MedicineFilters from "src/components/Medicine/MedicineFilters.vue";
 import InfoPopover from "src/components/InfoPopover.vue";
+import ButtonAction from "../components/Button-Action.vue";
 
 const search = ref("");
 const route = useRoute();
@@ -409,7 +393,6 @@ const columns = [
 const pagination = ref({
   rowsPerPage: 10,
 });
-// New medicine reactive object
 const newMedicine = reactive<MedicineForm>({
   id: 0,
   name: "",
