@@ -32,16 +32,17 @@
             :pagination="{ rowsPerPage: 5 }"
             class="urgent-medicines-table"
           >
-          <template v-slot:no-data>
-            <div class="text-center q-pa-md text-grey-7 text-h6">
-              <q-icon name="medication" 
-                size="md" 
-                class="q-mr-sm" 
-                color="red"
-              />
-              Nenhum medicamento encontrado.
-            </div>
-          </template>
+            <template v-slot:no-data>
+              <div class="text-center q-pa-md text-grey-7 text-h6">
+                <q-icon
+                  name="medication"
+                  size="md"
+                  class="q-mr-sm"
+                  color="red"
+                />
+                Nenhum medicamento encontrado.
+              </div>
+            </template>
             <template v-slot:body-cell-boxes="props">
               <q-td :props="props" style="font-size: 16px">
                 <q-chip color="negative" text-color="white" dense>
@@ -52,42 +53,11 @@
 
             <template v-slot:body-cell-actions="props">
               <q-td :props="props" class="q-gutter-sm">
-                <q-btn
-                  v-if="'id' in props.row"
-                  flat
-                  round
-                  color="primary"
-                  icon="add"
-                  label="Add caixa"
-                  @click="addAgain(props.row)"
-                />
-                <q-btn
-                  v-else
-                  flat
-                  round
-                  color="positive"
-                  icon="edit"
-                  label="Add novamente"
-                  size="md"
-                  @click="editMedicine(props.row)"
-                />
-                <q-btn
-                  v-if="'id' in props.row"
-                  flat
-                  round
-                  color="negative"
-                  icon="delete"
-                  label="Apagar"
-                  size="md"
-                  @click="deleteMedicine(props.row)"
-                />
-                <q-btn
-                  v-else
-                  flat
-                  round
-                  color="negative"
-                  icon="delete"
-                  @click="deleteNotificationBySnapshot(props.row)"
+                <ButtonAction
+                  :row="props.row"
+                  @edit="editMedicine"
+                  @add="addAgain"
+                  @delete="(row) => getDeleteHandler(row)(row)"
                 />
               </q-td>
             </template>
@@ -118,6 +88,7 @@ import type {
   MedicineToReplace,
 } from "../../types/Medicine/medicine";
 import type { Notification } from "../../types/Notification/notification";
+import ButtonAction from "../Button-Action.vue";
 
 const router = useRouter();
 const { success, error, info } = useNotify();
@@ -193,7 +164,7 @@ const editMedicine = async (medicine: Medicine) => {
   });
 };
 
-const addAgain = async (medicine:Medicine) => {
+const addAgain = async (medicine: Medicine) => {
   try {
     const updatedMedicine = {
       ...medicine,
@@ -201,12 +172,20 @@ const addAgain = async (medicine:Medicine) => {
     };
     await api.put(`/medication/${medicine.id}`, updatedMedicine);
     success("Mais uma caixa adicionada ao estoque!");
-    await fetchMedicinesData(); 
+    await fetchMedicinesData();
   } catch (err) {
     error("Erro ao adicionar caixa ao medicamento.");
     console.error(err);
   }
 };
+function getDeleteHandler(row: Medicine | MedicineToReplace) {
+  // If it is a real medicine (has an ID), delete medicine
+  if ("id" in row) {
+    return deleteMedicine;
+  }
+  // If it is a replacement item, delete notification
+  return deleteNotificationBySnapshot;
+}
 
 const deleteMedicine = async (medicine: Medicine | MedicineToReplace) => {
   if ("id" in medicine) {
