@@ -9,21 +9,21 @@
           Lista de medicamentos que voçe está utilizando atualmente.
         </p>
       </div>
-      
-        <InfoPopover class="col-12 col-md-6 popover-responsive">
-          <p>
-            Gerencie facilmente seus medicamentos nesta página. Você pode
-            adicionar novos medicamentos, editar informações, marcar como em
-            uso, definir lembretes e remover itens da sua lista.
-          </p>
-          <ul style="margin: 0; padding-left: 18px">
-            <li>Adicione novos medicamentos à sua lista</li>
-            <li>Edite ou exclua medicamentos existentes</li>
-            <!-- <li>Marque medicamentos como ativos ou inativos</li> -->
-            <li>Defina lembretes para horários de uso</li>
-            <li>Visualize detalhes e histórico de uso</li>
-          </ul>
-        </InfoPopover>
+
+      <InfoPopover class="col-12 col-md-6 popover-responsive">
+        <p>
+          Gerencie facilmente seus medicamentos nesta página. Você pode
+          adicionar novos medicamentos, editar informações, marcar como em uso,
+          definir lembretes e remover itens da sua lista.
+        </p>
+        <ul style="margin: 0; padding-left: 18px">
+          <li>Adicione novos medicamentos à sua lista</li>
+          <li>Edite ou exclua medicamentos existentes</li>
+          <!-- <li>Marque medicamentos como ativos ou inativos</li> -->
+          <li>Defina lembretes para horários de uso</li>
+          <li>Visualize detalhes e histórico de uso</li>
+        </ul>
+      </InfoPopover>
     </div>
 
     <div
@@ -133,18 +133,11 @@
               option-label="nome_medicamento"
               option-value="nome_medicamento"
               emit-value
-              @filter="
-                (val, update) => {
-                  fetchSuggestions(val).then((result) => {
-                    console.log('Sugestões recebidas:', result);
-                    suggestions = result;
-                    update(result);
-                  });
-                }
-              "
               label="Nome do medicamento"
               clearable
               outlined
+              new-value-mode="add-unique"
+              @new-value="(val) => (newMedicine.name = val)"
             />
             <q-input
               v-model="newMedicine.dosage"
