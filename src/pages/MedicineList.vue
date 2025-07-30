@@ -133,6 +133,23 @@
               option-label="nome_medicamento"
               option-value="nome_medicamento"
               emit-value
+              @filter="
+                async (val, update) => {
+                  if (!val || val.length < 2) {
+                    update(() => []);
+                    return;
+                  }
+                  try {
+                    const response = await api.get('/medication/autocomplete', {
+                      params: { q: val },
+                    });
+                    suggestions = response.data;
+                    update(() => response.data);
+                  } catch {
+                    update(() => []);
+                  }
+                }
+              "
               label="Nome do medicamento"
               clearable
               outlined
@@ -538,18 +555,6 @@ const fetchMedicines = async () => {
     error("Erro ao carregar medicamentos");
   } finally {
     loading.value = false;
-  }
-};
-
-const fetchSuggestions = async (query: string | null) => {
-  if (!query || query.length < 2) return [];
-  try {
-    const response = await api.get("/medication/autocomplete", {
-      params: { q: query },
-    });
-    return response.data;
-  } catch {
-    return [];
   }
 };
 
