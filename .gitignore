@@ -33,3 +33,6 @@ yarn-error.log*
 # local .env 
 .env
 .env.local*
+
+# Firebase
+.firebase/
