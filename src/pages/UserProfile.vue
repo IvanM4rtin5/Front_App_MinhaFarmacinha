@@ -247,6 +247,7 @@
 
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import { api } from "src/boot/axios";
 import { storeToRefs } from "pinia";
 import { useAuthStore } from "../stores/auth";
@@ -256,6 +257,7 @@ import ModalImportant from "src/components/Notify/ModalImportant.vue";
 import type { Products } from "src/types/StoreList/products";
 import CardActiveMedicines from "src/components/Cards/CardActiveMedicines.vue";
 
+const router = useRouter();
 const authStore = useAuthStore();
 const { name, user, avatarUrl } = storeToRefs(authStore);
 const { error, info } = useNotify();
@@ -293,6 +295,7 @@ function handleDeleteAccount() {
       useNotify().error(msg);
     },
   });
+  void router.push("/");
 }
 
 const handleAvatarUpload = () => {

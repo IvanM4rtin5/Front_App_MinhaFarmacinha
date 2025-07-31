@@ -10,7 +10,7 @@
           class="text-grey-7"
           style="cursor: pointer; display: inline-block"
         >
-          Bem-vindo {{ name }}
+          Bem-vindo {{ name? name.split(' ').map(n => n.charAt(0).toUpperCase() + n.slice(1).toLowerCase()).join(' ') : "Usuário"  }}
           <q-tooltip style="top: -6px"> Clique para ver seu perfil</q-tooltip>
         </p>
       </div>
@@ -33,7 +33,7 @@
       </div>
     </div>
 
-    <CardMedicines :shopping-list="3" next-reminder="Omeprazol às 09:00" />
+    <CardMedicines/>
   </q-page>
 </template>
 
