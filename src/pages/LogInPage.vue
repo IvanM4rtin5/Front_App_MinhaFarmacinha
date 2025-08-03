@@ -28,9 +28,12 @@
               label="E-mail"
               outlined
               dense
-              class="q-mb-md"
+              class="q-mb-sm"
               color="blue"
               autocomplete="email"
+              :error="!!usernameError"
+              :error-message="usernameError"
+              @blur="validateUsername"
             />
 
             <q-input
@@ -42,6 +45,9 @@
               dense
               class="q-mb-lg"
               color="blue"
+              :error="!!passwordError"
+              :error-message="passwordError"
+              @blur="validatePassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -53,7 +59,7 @@
             </q-input>
 
             <div class="row q-gutter-sm">
-              <q-btn label="Entrar" type="submit" color="primary" />
+              <q-btn label="Entrar" type="submit" color="primary" :disabled="isLoginDisabled" />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
             </div>
             <div class="text-center q-mt-md q-mb-lg">
@@ -93,9 +99,11 @@
               label="E-mail"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
               autocomplete="email"
+              :error="!!usernameError"
+              :error-message="usernameError"
+              @blur="validateUsername"
             />
 
             <q-input
@@ -105,8 +113,11 @@
               autocomplete="current-password"
               outlined
               dense
-              class="q-mb-lg"
+              class="q-mb-md"
               color="blue"
+              :error="!!passwordError"
+              :error-message="passwordError"
+              @blur="validatePassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -123,6 +134,7 @@
                 type="submit"
                 color="primary"
                 @click="handleLogin"
+                :disabled="isLoginDisabled"
               />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
             </div>
@@ -151,7 +163,7 @@
 
 <script setup lang="ts">
 import { useRouter } from "vue-router";
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { useAuthStore } from "../stores/auth";
 import { useNotify } from "../composables/useNotify";
 
@@ -161,6 +173,8 @@ const isPwd = ref(true);
 const router = useRouter();
 const authStore = useAuthStore();
 const { success, error } = useNotify();
+const usernameError = ref("");
+const passwordError = ref("");
 
 const isMobile = ref(window.innerWidth <= 700);
 
@@ -174,6 +188,27 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
+
+const isLoginDisabled = computed(() => {
+  return !username.value || !password.value;
+});
+
+const validateUsername = () => {
+  if (!username.value) {
+    usernameError.value = "Digite seu e-mail";
+  } else {
+    usernameError.value = "";
+  }
+};
+
+const validatePassword = () => {
+
+  if (!password.value) {
+    passwordError.value = "Digite sua senha";
+  } else {
+    passwordError.value = "";
+  }
+};
 
 const handleLogin = async () => {
   const user = await authStore.login(username.value, password.value, {

@@ -29,9 +29,12 @@
               label="Nome Completo"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!nameError"
+              :error-message="nameError"
+              @blur="validateName"
             />
 
             <!-- Data de nascimento -->
@@ -41,9 +44,12 @@
               label="Data de Nascimento"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!dateError"
+              :error-message="dateError"
+              @blur="validateDate"
             >
               <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
             </q-input>
@@ -58,6 +64,9 @@
               class="q-mb-md"
               color="blue"
               :input-style="{ fontSize: '16px' }"
+              :error="!!emailError"
+              :error-message="emailError"
+              @blur="validateEmail"
             />
 
             <!-- Senha -->
@@ -67,9 +76,12 @@
               :type="isPwd ? 'password' : 'text'"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!passwordError"
+              :error-message="passwordError"
+              @blur="validatePassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -87,9 +99,11 @@
               :type="isPwdConfirm ? 'password' : 'text'"
               outlined
               dense
-              class="q-mb-lg"
               color="blue"
               :input-style="{ fontSize: '16px' }"
+              :error="!!confirmPasswordError"
+              :error-message="confirmPasswordError"
+              @blur="validateConfirmPassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -106,6 +120,7 @@
                 type="submit"
                 color="primary"
                 class="action-button"
+                :disabled="isSignUpDisabled"
               />
               <q-btn
                 label="Cancelar"
@@ -142,9 +157,12 @@
               label="Nome Completo"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!nameError"
+              :error-message="nameError"
+              @blur="validateName"
             />
 
             <!-- Data de nascimento -->
@@ -153,9 +171,12 @@
               type="date"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!dateError"
+              :error-message="dateError"
+              @blur="validateDate"
             >
               <q-tooltip>Selecione sua data de nascimento.</q-tooltip>
             </q-input>
@@ -170,6 +191,9 @@
               class="q-mb-md"
               color="blue"
               :input-style="{ fontSize: '16px' }"
+              :error="!!emailError"
+              :error-message="emailError"
+              @blur="validateEmail"
             />
 
             <!-- Senha -->
@@ -179,9 +203,12 @@
               :type="isPwd ? 'password' : 'text'"
               outlined
               dense
-              class="q-mb-md"
               color="blue"
+              class="q-mb-sm"
               :input-style="{ fontSize: '16px' }"
+              :error="!!passwordError"
+              :error-message="passwordError"
+              @blur="validatePassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -199,9 +226,11 @@
               :type="isPwdConfirm ? 'password' : 'text'"
               outlined
               dense
-              class="q-mb-lg"
               color="blue"
               :input-style="{ fontSize: '16px' }"
+              :error="!!confirmPasswordError"
+              :error-message="confirmPasswordError"
+              @blur="validateConfirmPassword"
             >
               <template v-slot:append>
                 <q-icon
@@ -218,6 +247,7 @@
                 type="submit"
                 color="primary"
                 class="action-button"
+                :disabled="isSignUpDisabled"
               />
               <q-btn
                 label="Cancelar"
@@ -240,7 +270,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from "vue";
+import { ref, onMounted, onUnmounted, computed } from "vue";
 import { api } from "src/boot/axios";
 import { useRouter } from "vue-router";
 import { useNotify } from "src/composables/useNotify";
@@ -255,6 +285,11 @@ const isPwdConfirm = ref(true);
 const loading = ref(false);
 const router = useRouter();
 const { success, error } = useNotify();
+const nameError = ref("");
+const dateError = ref("");
+const emailError = ref("");
+const passwordError = ref("");
+const confirmPasswordError = ref("");
 
 const isMobile = ref(window.innerWidth <= 700);
 
@@ -269,35 +304,104 @@ onUnmounted(() => {
   window.removeEventListener("resize", handleResize);
 });
 
+// Funções de validação
+const validateName = () => {
+  if (!name.value.trim()) {
+    nameError.value = "Digite seu nome completo";
+  } else if (name.value.trim().length < 3) {
+    nameError.value = "Nome deve ter pelo menos 3 caracteres";
+  } else {
+    nameError.value = "";
+  }
+};
+
+const validateDate = () => {
+  if (!date.value) {
+    dateError.value = "Selecione sua data de nascimento";
+  } else {
+    const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
+    if (!dateRegex.test(date.value)) {
+      dateError.value = "Data de nascimento inválida";
+    } else {
+      const selectedDate = new Date(date.value);
+      const today = new Date();
+      if (selectedDate > today) {
+        dateError.value = "Data de nascimento não pode ser futura";
+      } else {
+        dateError.value = "";
+      }
+    }
+  }
+};
+
+const validateEmail = () => {
+  if (!email.value) {
+    emailError.value = "Digite seu e-mail";
+  } else {
+    const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    if (!emailRegex.test(email.value)) {
+      emailError.value = "Digite um e-mail válido";
+    } else {
+      emailError.value = "";
+    }
+  }
+};
+
+const validatePassword = () => {
+  if (!password.value) {
+    passwordError.value = "Digite sua senha";
+  } else if (password.value.length < 6) {
+    passwordError.value = "Senha deve ter pelo menos 6 caracteres";
+  } else {
+    passwordError.value = "";
+  }
+};
+
+const validateConfirmPassword = () => {
+  if (!confirmPassword.value) {
+    confirmPasswordError.value = "Confirme sua senha";
+  } else if (password.value !== confirmPassword.value) {
+    confirmPasswordError.value = "As senhas não coincidem";
+  } else {
+    confirmPasswordError.value = "";
+  }
+};
+
+const isSignUpDisabled = computed(() => {
+  return (
+    !name.value ||
+    !date.value ||
+    !email.value ||
+    !password.value ||
+    !confirmPassword.value ||
+    !!nameError.value ||
+    !!dateError.value ||
+    !!emailError.value ||
+    !!passwordError.value ||
+    !!confirmPasswordError.value
+  );
+});
+
 const handleSignUp = async () => {
   if (loading.value) return;
+  validateName();
+  validateDate();
+  validateEmail();
+  validatePassword();
+  validateConfirmPassword();
+
+  // Se há erros, não prosseguir
+  if (
+    nameError.value ||
+    dateError.value ||
+    emailError.value ||
+    passwordError.value ||
+    confirmPasswordError.value
+  ) {
+    return;
+  }
+
   loading.value = true;
-
-  if (password.value !== confirmPassword.value) {
-    error("As senhas não coincidem!");
-    loading.value = false;
-    return;
-  }
-
-  if (!name.value || !date.value || !email.value || !password.value) {
-    error("Por favor, preencha todos os campos!");
-    loading.value = false;
-    return;
-  }
-
-  // Email validation
-  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-  if (!emailRegex.test(email.value)) {
-    error("Por favor, insira um email válido!");
-    return;
-  }
-
-  //  YYYY-MM-DD date format validation
-  const dateRegex = /^\d{4}-\d{2}-\d{2}$/;
-  if (!dateRegex.test(date.value)) {
-    error("Data de nascimento inválida!");
-    return;
-  }
 
   const user = {
     username: name.value,
@@ -340,7 +444,7 @@ const goToLogin = async () => {
   display: flex;
   justify-content: center;
   align-items: center;
-  padding: 1rem;
+  padding: 0.5em;
 }
 
 .signup-container {
