@@ -7,6 +7,22 @@ const routes: RouteRecordRaw[] = [
     children: [
       { path: "", component: () => import("pages/LogInPage.vue") },
       { path: "signup", component: () => import("pages/SignUpPage.vue") },
+      {
+        path: "reset-password",
+        component: () => import("pages/resetPassword/requestPassword.vue"),
+      },
+      {
+        path: "reset-password/confirm",
+        component: () => import("pages/resetPassword/confirmPassword.vue"),
+      },
+      {
+        path: "reset-password/confirm/:token",
+        component: () => import("pages/resetPassword/confirmPassword.vue"),
+      },
+      {
+        path: "confirm-password/:token",
+        component: () => import("pages/resetPassword/confirmPassword.vue"),
+      },
     ],
   },
   {
@@ -37,12 +53,12 @@ const routes: RouteRecordRaw[] = [
         path: "chat",
         component: () => import("pages/ChatAssistant.vue"),
         meta: { requiresAuth: true },
-      }, 
+      },
       {
-        path: 'calendar',
-        component: () => import('src/components/MedicineCalendar.vue'),
-        name: 'MedicineCalendar'
-      } 
+        path: "calendar",
+        component: () => import("src/components/MedicineCalendar.vue"),
+        name: "MedicineCalendar",
+      },
     ],
   },
   {

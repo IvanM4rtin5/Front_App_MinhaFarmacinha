@@ -59,7 +59,12 @@
             </q-input>
 
             <div class="row q-gutter-sm">
-              <q-btn label="Entrar" type="submit" color="primary" :disabled="isLoginDisabled" />
+              <q-btn
+                label="Entrar"
+                type="submit"
+                color="primary"
+                :disabled="isLoginDisabled"
+              />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
             </div>
             <div class="text-center q-mt-md q-mb-lg">
@@ -70,6 +75,15 @@
                 style="text-decoration: none"
               >
                 Cadastre-se
+              </router-link>
+            </div>
+            <div class="text-center q-mt-sm">
+              <router-link
+                to="/reset-password"
+                class="text-primary text-weight-medium"
+                style="text-decoration: none; font-size: 14px"
+              >
+                Esqueceu sua senha?
               </router-link>
             </div>
           </form>
@@ -148,6 +162,15 @@
                 Cadastre-se
               </router-link>
             </div>
+            <div class="text-center q-mt-sm">
+              <router-link
+                to="/reset-password"
+                class="text-primary text-weight-medium"
+                style="text-decoration: none; font-size: 14px"
+              >
+                Esqueceu sua senha?
+              </router-link>
+            </div>
           </form>
         </div>
         <div class="login-right">
@@ -202,7 +225,6 @@ const validateUsername = () => {
 };
 
 const validatePassword = () => {
-
   if (!password.value) {
     passwordError.value = "Digite sua senha";
   } else {
