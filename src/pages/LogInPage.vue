@@ -76,15 +76,15 @@
               >
                 Cadastre-se
               </router-link>
-            </div>
-            <div class="text-center q-mt-sm">
-              <router-link
-                to="/reset-password"
-                class="text-primary text-weight-medium"
-                style="text-decoration: none; font-size: 14px"
-              >
-                Esqueceu sua senha?
-              </router-link>
+              <div class="q-mt-sm">
+                <router-link
+                  to="/reset-password"
+                  class="text-primary text-weight-medium"
+                  style="text-decoration: none; font-size: 14px"
+                >
+                  Esqueceu sua senha?
+                </router-link>
+              </div>
             </div>
           </form>
         </div>
@@ -369,7 +369,6 @@ input {
   object-fit: contain;
   margin: 32px 0 12px 0;
   z-index: 2;
-  background: var(--white);
   border-radius: 16px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
   position: relative;

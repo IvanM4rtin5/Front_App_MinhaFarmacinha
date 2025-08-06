@@ -545,7 +545,6 @@ input {
     object-fit: contain;
     margin: 32px 0 12px 0;
     z-index: 2;
-    background: var(--white);
     border-radius: 16px;
     box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
     position: relative;

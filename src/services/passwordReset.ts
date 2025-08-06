@@ -26,7 +26,7 @@ export interface ApiError {
 export const passwordResetService = {
   async requestReset(data: PasswordResetRequest): Promise<{ message: string }> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/v1/reset_password/request`,
+      `${API_BASE_URL}/reset_password/request`,
       data
     );
     return response.data;
@@ -34,14 +34,14 @@ export const passwordResetService = {
 
   async verifyToken(token: string): Promise<TokenVerificationResponse> {
     const response = await axios.get(
-      `${API_BASE_URL}/api/v1/reset_password/verify-token/${token}`
+      `${API_BASE_URL}/reset_password/verify-token/${token}`
     );
     return response.data;
   },
 
   async confirmReset(data: PasswordResetConfirm): Promise<{ message: string }> {
     const response = await axios.post(
-      `${API_BASE_URL}/api/v1/reset_password/confirm`,
+      `${API_BASE_URL}/reset_password/confirm`,
       data
     );
     return response.data;

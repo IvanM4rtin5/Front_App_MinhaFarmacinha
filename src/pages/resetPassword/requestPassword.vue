@@ -179,7 +179,6 @@ const handleRequestPassword = async () => {
       position: "top",
       timeout: 3000,
     });
-
   } catch (error: unknown) {
     const message = getErrorMessage(error);
 
@@ -195,7 +194,7 @@ const handleRequestPassword = async () => {
 };
 
 const goBack = () => {
-  router.push("/");
+  void router.push("/");
 };
 </script>
 
@@ -289,9 +288,19 @@ const goBack = () => {
     margin: 0 10px;
   }
 
-  .logo-img {
+  /* .logo-img {
     width: 60px;
     height: 60px;
-  }
+  } */
+  .logo-img {
+  width: 80px;
+  height: 80px;
+  object-fit: contain;
+  margin: 32px 0 12px 0;
+  z-index: 2;
+  border-radius: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  position: relative;
+}
 }
 </style>
