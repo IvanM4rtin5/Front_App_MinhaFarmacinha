@@ -63,6 +63,7 @@
                 label="Entrar"
                 type="submit"
                 color="primary"
+                :loading="isLoading" 
                 :disabled="isLoginDisabled"
               />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
@@ -148,6 +149,7 @@
                 type="submit"
                 color="primary"
                 @click="handleLogin"
+                :loading="isLoading" 
                 :disabled="isLoginDisabled"
               />
               <q-btn label="Cancelar" color="negative" class="q-ml-lg" />
@@ -198,6 +200,7 @@ const authStore = useAuthStore();
 const { success, error } = useNotify();
 const usernameError = ref("");
 const passwordError = ref("");
+const isLoading = ref(false);
 
 const isMobile = ref(window.innerWidth <= 700);
 
@@ -233,15 +236,24 @@ const validatePassword = () => {
 };
 
 const handleLogin = async () => {
-  const user = await authStore.login(username.value, password.value, {
-    success,
-    error,
-  });
+  isLoading.value = true;
+  try {
+    const user = await authStore.login(username.value, password.value, {
+      success,
+      error,
+    });
 
-  if (user) {
-    await router.push("/app/home");
+    if (user) {
+      await router.push("/app/home");
+    }
+  } catch (err) {
+    console.error("Erro no login:", err);
+    error("Falha no login, tente novamente.");
+  } finally {
+    isLoading.value = false; 
   }
 };
+
 </script>
 
 <style scoped>

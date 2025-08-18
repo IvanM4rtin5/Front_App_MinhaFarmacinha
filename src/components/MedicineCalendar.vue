@@ -40,10 +40,11 @@ import "vue-cal/dist/vuecal.css";
 import { storeToRefs } from "pinia";
 import { useQuasar, Dialog } from "quasar";
 import { useMedicinesStore } from "../stores/medicine";
+import { useDoseHistoryStore } from "src/stores/doseHistory";
 import { useNotificationStore } from "src/stores/notification";
 import type { CalendarEvent } from "../types/Calendar/eventCalendar";
-import type { AxiosError } from "axios";
 import InfoPopover from "./InfoPopover.vue";
+import type { AxiosError } from "axios";
 
 const $q = useQuasar();
 const view = ref("day");
@@ -54,14 +55,19 @@ const { medicines } = storeToRefs(medicinesStore);
 const notificationStore = useNotificationStore();
 const { notifications } = storeToRefs(notificationStore);
 
+const doseHistoryStore = useDoseHistoryStore();
+const { doses } = storeToRefs(doseHistoryStore);
+
 onMounted(() => {
   void notificationStore.fetchNotifications();
   void medicinesStore.fetchMedicines();
+  void doseHistoryStore.fetchDoseHistory();
 });
 
 const events = computed<CalendarEvent[]>(() => {
   const today = new Date();
-  return medicines.value.flatMap((med) => {
+
+  const futureEvents: CalendarEvent[] = medicines.value.flatMap((med) => {
     if (!med.schedules || !med.days_until_empty) return [];
 
     return Array.from({ length: med.days_until_empty }, (_, i) => {
@@ -78,7 +84,6 @@ const events = computed<CalendarEvent[]>(() => {
           minute ?? 0
         );
 
-        // Relaciona notificação pelo horário e medicamento
         const notification = notifications.value.find(
           (n) =>
             n.medication_id === med.id &&
@@ -95,10 +100,33 @@ const events = computed<CalendarEvent[]>(() => {
           medicineId: med.id,
           notificationId: notification ? notification.id : null,
           notificationStatus: notification ? notification.status : null,
+          doseId: null,
+          status: "pending" as const,
         };
       });
     }).flat();
   });
+
+  const pastEvents: CalendarEvent[] = doses.value
+    .filter((dose) => dose.taken_at !== null)
+    .map((dose) => ({
+      start: new Date(dose.taken_at!),
+      end: new Date(new Date(dose.taken_at!).getTime() + 30 * 60000),
+      title: `${dose.medicine_name} ${dose.dosage}mg`,
+      category: dose.category,
+      medicineId: dose.medication_id,
+      notificationId: dose.notification_id || null,
+      notificationStatus: dose.status,
+      doseId: dose.id,
+      status:
+        dose.status === "tomada"
+          ? "taken"
+          : dose.status === "esquecida"
+          ? "missed"
+          : "pending",
+    }));
+
+  return [...pastEvents, ...futureEvents];
 });
 
 function onEventClick(event: CalendarEvent) {

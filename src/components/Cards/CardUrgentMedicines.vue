@@ -190,7 +190,7 @@ function getDeleteHandler(row: Medicine | MedicineToReplace) {
 const deleteMedicine = async (medicine: Medicine | MedicineToReplace) => {
   if ("id" in medicine) {
     try {
-      await api.delete(`/medication/${medicine.id}`);
+      await api.delete(`/dose-history/medication/${medicine.id}`);
       urgentMedicines.value = urgentMedicines.value.filter(
         (m) => !("id" in m && m.id === medicine.id)
       );
