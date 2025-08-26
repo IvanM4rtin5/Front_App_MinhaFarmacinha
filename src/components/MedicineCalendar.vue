@@ -25,7 +25,7 @@
     <vue-cal
       locale="pt-br"
       style="height: 500px"
-      :events="events"
+      :events="computedEvents"
       :time="true"
       :view="view"
       @event-click="onEventClick"
@@ -47,7 +47,7 @@ import InfoPopover from "./InfoPopover.vue";
 import type { AxiosError } from "axios";
 
 const $q = useQuasar();
-const view = ref("day");
+const view = ref("month");
 
 const medicinesStore = useMedicinesStore();
 const { medicines } = storeToRefs(medicinesStore);
@@ -58,91 +58,39 @@ const { notifications } = storeToRefs(notificationStore);
 const doseHistoryStore = useDoseHistoryStore();
 const { doses } = storeToRefs(doseHistoryStore);
 
-onMounted(() => {
-  void notificationStore.fetchNotifications();
-  void medicinesStore.fetchMedicines();
-  void doseHistoryStore.fetchDoseHistory();
-});
+onMounted(async () => {
+  await Promise.all([
+    notificationStore.fetchNotifications(),
+    medicinesStore.fetchMedicines(),
+    doseHistoryStore.fetchDoseHistory(),
+  ]);
 
-const events = computed<CalendarEvent[]>(() => {
-  const today = new Date();
-
-  const futureEvents: CalendarEvent[] = medicines.value.flatMap((med) => {
-    if (!med.schedules || !med.days_until_empty) return [];
-
-    return Array.from({ length: med.days_until_empty }, (_, i) => {
-      const eventDay = new Date(today);
-      eventDay.setDate(today.getDate() + i);
-
-      return (med.schedules || []).map((time) => {
-        const [hour, minute] = time.split(":").map(Number);
-        const start = new Date(
-          eventDay.getFullYear(),
-          eventDay.getMonth(),
-          eventDay.getDate(),
-          hour,
-          minute ?? 0
-        );
-
-        const notification = notifications.value.find(
-          (n) =>
-            n.medication_id === med.id &&
-            n.notification_type === "medication_reminder" &&
-            n.scheduled_for &&
-            new Date(n.scheduled_for).getTime() === start.getTime()
-        );
-
-        return {
-          start,
-          end: new Date(start.getTime() + 30 * 60000),
-          title: `${med.name} ${med.dosage}mg`,
-          category: med.category,
-          medicineId: med.id,
-          notificationId: notification ? notification.id : null,
-          notificationStatus: notification ? notification.status : null,
-          doseId: null,
-          status: "pending" as const,
-        };
-      });
-    }).flat();
-  });
-
-  const pastEvents: CalendarEvent[] = doses.value
-    .filter((dose) => dose.taken_at !== null)
-    .map((dose) => ({
-      start: new Date(dose.taken_at!),
-      end: new Date(new Date(dose.taken_at!).getTime() + 30 * 60000),
-      title: `${dose.medicine_name} ${dose.dosage}mg`,
-      category: dose.category,
-      medicineId: dose.medication_id,
-      notificationId: dose.notification_id || null,
-      notificationStatus: dose.status,
-      doseId: dose.id,
-      status:
-        dose.status === "tomada"
-          ? "taken"
-          : dose.status === "esquecida"
-          ? "missed"
-          : "pending",
-    }));
-
-  return [...pastEvents, ...futureEvents];
+  // Debug: verifique se as doses estão carregando
+  console.log("Doses carregadas:", doses.value);
+  console.log("Medicamentos carregados:", medicines.value);
 });
 
 function onEventClick(event: CalendarEvent) {
   if (event.notificationStatus === "READ") {
     $q.notify({ type: "info", message: "Dose marcada como tomada!" });
+    if (event.status === "taken" || event.status === "missed") {
+      $q.notify({
+        type: "info",
+        message: `Esta dose já foi ${
+          event.status === "taken" ? "tomada" : "marcada como esquecida"
+        }.`,
+      });
+    }
     return;
   }
-
   Dialog.create({
     title: "Confirmação de Dose",
     message: `
-    <div style="text-align:center;">
-      <span class="material-icons" style="font-size:40px;color:#1976d2;margin-bottom:8px;">medication</span>
-      <div>Você tomou o medicamento <b>${event.title}</b> neste horário?</div>
-    </div>
-  `,
+      <div style="text-align:center;">
+        <span class="material-icons" style="font-size:40px;color:#1976d2;margin-bottom:8px;">medication</span>
+        <div>Você tomou o medicamento <b>${event.title}</b> neste horário?</div>
+      </div>
+    `,
     html: true,
     cancel: {
       label: "Cancelar",
@@ -162,6 +110,78 @@ function onEventClick(event: CalendarEvent) {
   });
 }
 
+const computedEvents = computed<CalendarEvent[]>(() => {
+  const allEvents: CalendarEvent[] = [];
+
+  doses.value
+    .filter((dose) => dose.taken_at !== null)
+    .forEach((dose) => {
+      const start = new Date(dose.taken_at!);
+      allEvents.push({
+        start: new Date(dose.taken_at!),
+        end: new Date(start.getTime() + 30 * 60000),
+        title: `${dose.medicine_name} ${dose.dosage}mg`,
+        category: dose.category,
+        medicineId: dose.medication_id,
+        notificationId: dose.notification_id || null,
+        notificationStatus: dose.status,
+        doseId: dose.id,
+        status:
+          dose.status === "tomada"
+            ? "taken"
+            : dose.status === "esquecida"
+            ? "missed"
+            : "pending",
+      });
+    });
+
+  medicines.value.forEach((med) => {
+    if (!med.schedules || !med.days_until_empty || !med.created_at) return;
+
+    const startDate = new Date(med.created_at);
+
+    for (let i = 0; i < med.days_until_empty; i++) {
+      const eventDay = new Date(startDate);
+      eventDay.setDate(startDate.getDate() + i);
+
+      med.schedules.forEach((time) => {
+        const [hour, minute] = time.split(":").map(Number);
+        const start = new Date(
+          eventDay.getFullYear(),
+          eventDay.getMonth(),
+          eventDay.getDate(),
+          hour,
+          minute ?? 0
+        );
+
+        const notification = notifications.value.find(
+          (n) =>
+            n.medication_id === med.id &&
+            n.notification_type === "medication_reminder" &&
+            n.scheduled_for &&
+            new Date(n.scheduled_for).getTime() === start.getTime()
+        );
+
+        allEvents.push({
+          start,
+          end: new Date(start.getTime() + 30 * 60000),
+          title: `${med.name} ${med.dosage}mg`,
+          category: med.category,
+          medicineId: med.id,
+          notificationId: notification ? notification.id : null,
+          notificationStatus: notification ? notification.status : null,
+          doseId: null,
+          status: "pending",
+          takenAt: null,
+          wasTaken: false,
+        });
+      });
+    }
+  });
+
+  return allEvents;
+});
+
 async function handleDoseConfirmation(event: CalendarEvent) {
   try {
     await medicinesStore.consumeDose(event.medicineId, event.start);
@@ -172,12 +192,14 @@ async function handleDoseConfirmation(event: CalendarEvent) {
 
     $q.notify({
       type: "positive",
-      message: "Dose Realizada com sucesso!",
+      message: "Dose registrada com sucesso!",
     });
 
-    // Atualize medicamentos e notificações após a ação
-    await medicinesStore.fetchMedicines();
-    await notificationStore.fetchNotifications();
+    await Promise.all([
+      medicinesStore.fetchMedicines(),
+      notificationStore.fetchNotifications(),
+      doseHistoryStore.fetchDoseHistory(),
+    ]);
   } catch (err: unknown) {
     if (
       err &&
@@ -199,6 +221,7 @@ async function handleDoseConfirmation(event: CalendarEvent) {
   }
 }
 </script>
+
 <style scoped>
 .vuecal__event {
   cursor: pointer;
@@ -222,5 +245,20 @@ async function handleDoseConfirmation(event: CalendarEvent) {
 }
 :deep(.vuecal__body *) {
   color: #000 !important;
+}
+
+:deep(.vuecal__event.taken) {
+  background-color: #4caf50 !important;
+  color: white !important;
+}
+
+:deep(.vuecal__event.missed) {
+  background-color: #f44336 !important;
+  color: white !important;
+}
+
+:deep(.vuecal__event.pending) {
+  background-color: #ff9800 !important;
+  color: white !important;
 }
 </style>

@@ -306,7 +306,9 @@ export default defineComponent({
         // console.warn("WebSocket não conectado: user_id ou token ausente");
         return;
       }
-      const wsUrl = `ws://localhost:8000/api/v1/notification/ws/${userId}?token=${token}`;
+
+      const baseWsUrl = import.meta.env.VITE_WS_URL;
+      const wsUrl = `${baseWsUrl}/notification/ws/${userId}?token=${token}`;
       websocket = new WebSocket(wsUrl);
 
       websocket.onopen = () => {

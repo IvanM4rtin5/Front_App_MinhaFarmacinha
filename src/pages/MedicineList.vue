@@ -608,28 +608,32 @@ const saveMedicine = async () => {
         ? (err as { response?: { status?: number } }).response?.status
         : undefined;
 
-    if (status === 409) {
-      info(
-        "Existe um medicamento com este nome e dose. Edite o medicamento existente."
-      );
-      await fetchMedicines();
-
-      const existing = medicines.value.find(
-        (m) =>
-          m.name.trim().toLowerCase() ===
-            newMedicine.name.trim().toLowerCase() &&
-          m.dosage === newMedicine.dosage
-      );
-      if (existing) {
-        error(
-          "Não foi possível localizar o medicamento duplicado para edição."
-        );
-      }
-      return;
+    if (status === 400) {
+      error("Por favor, preencha todos os campos obrigatórios.");
     }
-    error("Erro ao salvar medicamento");
-    console.error("Erro ao salvar medicamento:", err);
   }
+    // if (status === 409) {
+    //   info(
+    //     "Existe um medicamento com este nome e dose. Edite o medicamento existente."
+    //   );
+  //     await fetchMedicines();
+
+  //     const existing = medicines.value.find(
+  //       (m) =>
+  //         m.name.trim().toLowerCase() ===
+  //           newMedicine.name.trim().toLowerCase() &&
+  //         m.dosage === newMedicine.dosage
+  //     );
+  //     if (existing) {
+  //       error(
+  //         "Não foi possível localizar o medicamento duplicado para edição."
+  //       );
+  //     }
+  //     return;
+  //   }
+  //   error("Erro ao salvar medicamento");
+  //   console.error("Erro ao salvar medicamento:", err);
+  // }
 };
 
 const getStatusColor = (medicine: Medicine): string => {
